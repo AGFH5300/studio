@@ -1,0 +1,12 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Selected Concepts — STUDIO/AE", description: "Original website concepts across wellness, architecture, hospitality and technology." };
+
+const concepts = [
+  {n:"01",name:"Ritual House",sector:"Wellness / Ecommerce",cls:"ritual",headline:"Small rituals. Better days.",copy:"A warm, product-led storefront designed to make everyday wellness feel specific—not clinical.",features:["Shopify-ready","Editorial journal","Subscription path"]},
+  {n:"02",name:"Atelier N°8",sector:"Architecture / Editorial",cls:"atelier",headline:"Space, shaped with intent.",copy:"A restrained portfolio where projects, materials and thinking lead the visual story.",features:["Project CMS","Editorial layouts","Image-led motion"]},
+  {n:"03",name:"Serein",sector:"Hospitality / Booking",cls:"serein",headline:"An evening worth keeping.",copy:"A cinematic restaurant experience with a direct route from atmosphere to reservation.",features:["Booking integration","Menus + events","Mobile-first journey"]},
+  {n:"04",name:"NOMA Systems",sector:"Technology / B2B",cls:"noma",headline:"Make complexity useful.",copy:"A clear B2B platform story for technical buyers, procurement teams and future talent.",features:["Product storytelling","Lead qualification","Knowledge CMS"]},
+];
+
+export default function WorkPage(){return <main className="page-shell"><section className="subpage-hero dark"><small>SELECTED CONCEPTS</small><h1>Proof of range.<br/><em>Without invented clients.</em></h1><p>Four original design demonstrations, each built around a different industry, audience and commercial job.</p></section><section className="route-work-grid section-pad">{concepts.map((item,index)=><article className={`route-work ${item.cls}`} key={item.name}><div className="route-work-visual"><span>CONCEPT {item.n}</span>{index===0&&<div className="route-orbital">RITUAL</div>}{index===1&&<div className="route-number">08</div>}{index===2&&<div className="route-letter">S</div>}{index===3&&<div className="route-system"><i/><i/><i/><i/><i/><i/></div>}<h2>{item.headline}</h2></div><div className="route-work-copy"><div><small>{item.sector}</small><h3>{item.name}</h3></div><p>{item.copy}</p><ul>{item.features.map(x=><li key={x}>{x}</li>)}</ul></div></article>)}</section><section className="route-cta"><div><small>YOUR TURN</small><h2>Give us a business.<br/><em>We’ll give it a point of view.</em></h2></div><a className="button button-dark" href="/build">Build your website <span>↗</span></a></section></main>}
