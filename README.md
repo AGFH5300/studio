@@ -1,49 +1,47 @@
-# STUDIO/AE website
+# STUDIO/AE
 
-A premium, conversion-focused UAE web studio site built with Next.js. The current name **STUDIO/AE** is intentionally treated as a working brand so it can be replaced before launch without changing the product structure.
+A production-oriented multi-page website for a UAE web design and digital systems studio. STUDIO/AE is a temporary working brand.
 
-## Included
+## Routes
 
-- Premium responsive landing experience
-- Four packages: AED 999 / 2,499 / 4,999 / 9,999+
-- Interactive website cost calculator
-- Pricing dependencies (for example Blog → CMS, Ecommerce → CMS + payments)
-- Concept showcase cards clearly labelled so they do not pretend to be client work
-- Services, process, FAQ and project enquiry sections
-- SEO metadata + JSON-LD foundation
-- Contact API route using Resend when environment variables are configured
-- Mobile layouts
+- `/` — homepage
+- `/work` — clearly labelled concept portfolio
+- `/services` — capabilities and delivery approach
+- `/pricing` — four package starting points and FAQ
+- `/build` — client-side modular website estimator
+- `/process` — delivery process and differentiation
+- `/about` — studio positioning and principles
+- `/contact` — estimator-aware project enquiry
+- `/website-check` — clearly labelled simulated audit experience
+- `/privacy` — prototype privacy and commercial terms
 
-## Run locally
+## Run
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+## Enquiry delivery
 
-## Contact form environment variables
-
-Create `.env.local`:
+Create `.env.local` or configure equivalent deployment secrets:
 
 ```bash
 RESEND_API_KEY=re_xxxxxxxxx
-CONTACT_TO_EMAIL=hello@yourdomain.ae
-CONTACT_FROM_EMAIL="Studio Website <hello@yourdomain.ae>"
+LEAD_TO_EMAIL=projects@example.com
+LEAD_FROM_EMAIL="STUDIO/AE <website@your-verified-domain.ae>"
 ```
 
-For production, verify the sending domain with Resend first. Without these variables the form intentionally returns a configuration error instead of silently losing leads.
+The contact API validates input, uses a honeypot, keeps the provider key server-side and returns an explicit configuration error when delivery is unavailable. Verify the sender domain in Resend before launch.
 
-## Before launch
+## Commercial estimator
 
-1. Replace the working brand `STUDIO/AE` and `https://example.ae` metadata URL.
-2. Replace concept showcase work with genuine client work as projects are completed.
-3. Add the final email/domain and verified Resend configuration.
-4. Connect deployment (Vercel is the simplest fit for this stack).
-5. Add privacy/cookie language appropriate to the tracking and tools actually enabled.
-6. Consider rate limiting or Turnstile on the contact endpoint before paid traffic.
+The public UI never displays per-item add-on prices. Internal modular values generate only the final indicative estimate, so a one-page Signature design is priced by its actual scope rather than being forced to a package minimum. Dependencies such as Blog → CMS, Ecommerce → CMS + payments and Dashboard → Login are handled automatically.
 
-## Pricing logic
+## Before public launch
 
-The public calculator is implemented in `lib/pricing.ts`. It uses an internal component model rather than arbitrary package guessing. Package recommendations are generated from page count and complexity, while the displayed calculator result remains an estimate until scope is confirmed.
+1. Replace the working brand and prototype hostname.
+2. Configure the verified email sender and recipient.
+3. Replace concept work as genuine client work becomes available.
+4. Finalise company details, jurisdiction-specific legal text and analytics consent.
+5. Add a production anti-spam service before paid acquisition campaigns.
