@@ -1,5 +1,3 @@
-import { KineticHero } from "./hero-engine";
-
 const work = [
   { name: "Ritual House", type: "Wellness / Ecommerce", className: "ritual", tag: "CONCEPT 01", line: "Small rituals. Better days." },
   { name: "Atelier N°8", type: "Architecture / Editorial", className: "atelier", tag: "CONCEPT 02", line: "Space, shaped with intent." },
@@ -12,7 +10,6 @@ export default function Home() {
     <main>
       <section className="hero" id="top">
         <div className="hero-grid" aria-hidden="true"><i /><i /><i /><i /></div>
-        <KineticHero />
         <div className="eyebrow reveal"><span /> UAE WEB DESIGN + DIGITAL SYSTEMS</div>
         <h1 className="hero-title reveal"><span>Beautiful websites.</span><span className="hero-serif">Built to do <em>business.</em></span></h1>
         <div className="hero-bottom reveal">
