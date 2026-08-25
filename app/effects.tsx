@@ -7,6 +7,7 @@ type Point = { x:number; y:number; z:number; sx:number; sy:number; depth:number 
 
 export function KineticHero(){
   const canvasRef=useRef<HTMLCanvasElement>(null);
+  const stageRef=useRef<HTMLDivElement>(null);
   useEffect(()=>{
     const canvas=canvasRef.current;
     if(!canvas)return;
@@ -32,6 +33,7 @@ export function KineticHero(){
     const render=(now:number)=>{
       frame=requestAnimationFrame(render);if(!visible)return;
       pointer.x+=(pointer.tx-pointer.x)*.035;pointer.y+=(pointer.ty-pointer.y)*.035;
+      stageRef.current?.style.setProperty("--art-x",`${pointer.x*18}px`);stageRef.current?.style.setProperty("--art-y",`${pointer.y*14}px`);stageRef.current?.style.setProperty("--art-r",`${pointer.x*2.6}deg`);
       ctx.clearRect(0,0,width,height);
       const dark=document.documentElement.dataset.theme==="dark";
       const line=dark?"rgba(235,226,207,.16)":"rgba(20,20,20,.13)";
@@ -71,7 +73,7 @@ export function KineticHero(){
     resize();window.addEventListener("resize",resize);window.addEventListener("pointermove",move,{passive:true});document.addEventListener("visibilitychange",visibility);frame=requestAnimationFrame(render);
     return()=>{cancelAnimationFrame(frame);window.removeEventListener("resize",resize);window.removeEventListener("pointermove",move);document.removeEventListener("visibilitychange",visibility)};
   },[]);
-  return <div className="kinetic-stage" aria-hidden="true"><canvas ref={canvasRef}/><div className="kinetic-meta"><span>INTERACTIVE SIGNAL / 01</span><span>MOVE TO SHIFT THE FIELD</span></div><div className="kinetic-axis"><i/><span>DESIGN</span><span>TECHNOLOGY</span><span>MOTION</span></div></div>;
+  return <div className="kinetic-stage" ref={stageRef} aria-hidden="true"><div className="art-aura"/><canvas ref={canvasRef}/><img className="kinetic-art" src="/graphics/hero-sculpture.webp" alt=""/><div className="kinetic-meta"><span>INTERACTIVE SIGNAL / 01</span><span>MOVE TO SHIFT THE FIELD</span></div><div className="kinetic-axis"><i/><span>DESIGN</span><span>TECHNOLOGY</span><span>MOTION</span></div></div>;
 }
 
 export function MotionSystem(){
