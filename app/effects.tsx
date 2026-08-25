@@ -1,25 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-
-export function KineticHero(){
-  const stageRef=useRef<HTMLDivElement>(null);
-  useEffect(()=>{
-    const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const move=(event:PointerEvent)=>{
-      if(reduced)return;
-      const x=(event.clientX/window.innerWidth-.5);
-      const y=(event.clientY/window.innerHeight-.5);
-      stageRef.current?.style.setProperty("--art-x",`${x*14}px`);
-      stageRef.current?.style.setProperty("--art-y",`${y*10}px`);
-      stageRef.current?.style.setProperty("--art-r",`${x*1.2}deg`);
-    };
-    window.addEventListener("pointermove",move,{passive:true});
-    return()=>window.removeEventListener("pointermove",move);
-  },[]);
-  return <div className="kinetic-stage" ref={stageRef} aria-hidden="true"><img className="kinetic-art" src="/graphics/hero-minimal.webp" alt=""/><div className="kinetic-meta"><span>INTERACTIVE FORM / 01</span></div><div className="kinetic-axis"><i/><span>DESIGN</span><span>TECHNOLOGY</span></div></div>;
-}
 
 export function MotionSystem(){
   const pathname=usePathname();
@@ -35,3 +17,4 @@ export function MotionSystem(){
   },[pathname]);
   return null;
 }
+
