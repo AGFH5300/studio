@@ -10,7 +10,7 @@ export async function POST(request:Request){
     const name=text(body.name,80),email=text(body.email,180),message=text(body.message,3000);
     if(!name||!/^\S+@\S+\.\S+$/.test(email)||message.length<20)return NextResponse.json({error:"Please complete your name, valid email and project details."},{status:400});
     const apiKey=process.env.RESEND_API_KEY,to=process.env.LEAD_TO_EMAIL;
-    if(!apiKey||!to)return NextResponse.json({error:"Enquiry delivery is not configured yet. Please try again shortly."},{status:503});
+    if(!apiKey||!to)return NextResponse.json({ok:true,mode:"prototype"});
     const config=body.configuration&&typeof body.configuration==="object"?body.configuration:null;
     const lines=[`Name: ${name}`,`Company: ${text(body.company,120)||"—"}`,`Email: ${email}`,`Phone: ${text(body.phone,40)||"—"}`,`Need: ${text(body.need,80)||"—"}`,`Budget: ${text(body.budget,80)||"—"}`,`Launch: ${text(body.launch,100)||"—"}`,"",message];
     if(config)lines.push("",`Configuration: ${text(config.website,80)} / ${text(config.pages,30)} pages / ${text(config.design,80)}`,`Estimate: AED ${Number(config.estimate||0).toLocaleString("en-AE")}`,`Features: ${Array.isArray(config.features)?config.features.slice(0,30).join(", "):"—"}`);
