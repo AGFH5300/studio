@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  ["Work", "/work"],
   ["Services", "/services"],
   ["Pricing", "/pricing"],
-  ["Build yours", "/build"],
+  ["Build your website", "/build"],
   ["Process", "/process"],
   ["About", "/about"],
 ];
@@ -28,7 +27,7 @@ export function SiteHeader() {
   useEffect(()=>{setDark(document.documentElement.dataset.theme==="dark")},[]);
   const toggleTheme=()=>{const next=!dark;setDark(next);document.documentElement.dataset.theme=next?"dark":"light";localStorage.setItem("studio-theme",next?"dark":"light")};
 
-  const darkTop = ["/work","/build","/contact"].includes(pathname);
+  const darkTop = ["/build","/contact"].includes(pathname);
   return <header className={`site-header ${scrolled ? "scrolled" : ""} ${darkTop ? "over-dark" : ""}`}>
     <a className="brand" href="/" aria-label="STUDIO AE home">STUDIO<span>/AE</span></a>
     <nav className={open ? "open" : ""} aria-label="Primary navigation">
@@ -44,7 +43,7 @@ export function SiteFooter() {
     <div className="footer-brand">STUDIO<span>/AE</span></div>
     <div className="footer-line">
       <p>Built in the UAE.<br/><em>Designed for anywhere.</em></p>
-      <div><a href="/work">Work</a><a href="/services">Services</a><a href="/pricing">Pricing</a><a href="/build">Estimator</a><a href="/website-check">Website check</a></div>
+      <div><a href="/services">Services</a><a href="/pricing">Pricing</a><a href="/build">Build your website</a><a href="/website-check">Website check</a></div>
       <div><a href="/process">Process</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy + terms</a></div>
     </div>
     <div className="footer-bottom"><span>© 2026 STUDIO/AE</span><span>UAE WEB DESIGN + DIGITAL SYSTEMS</span></div>
