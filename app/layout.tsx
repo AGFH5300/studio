@@ -14,4 +14,4 @@ export const metadata: Metadata = {
 
 const themeScript=`(()=>{try{const saved=localStorage.getItem('studio-theme');const system=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=saved||(system?'dark':'light')}catch{document.documentElement.dataset.theme='light'}})()`;
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{__html:themeScript}} /></head><body><SiteHeader /><MotionSystem />{children}<SiteFooter /></body></html>; }
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" suppressHydrationWarning><head><meta name="codex-preview" content="development"/><script dangerouslySetInnerHTML={{__html:themeScript}} /></head><body><SiteHeader /><MotionSystem />{children}<SiteFooter /></body></html>; }

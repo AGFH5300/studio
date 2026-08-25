@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const navItems = [
   ["Services", "/services"],
@@ -24,12 +25,12 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(()=>{setDark(document.documentElement.dataset.theme==="dark")},[]);
+  useEffect(()=>{const frame=requestAnimationFrame(()=>setDark(document.documentElement.dataset.theme==="dark"));return()=>cancelAnimationFrame(frame)},[]);
   const toggleTheme=()=>{const next=!dark;setDark(next);document.documentElement.dataset.theme=next?"dark":"light";localStorage.setItem("studio-theme",next?"dark":"light")};
 
   const darkTop = ["/build","/contact"].includes(pathname);
   return <header className={`site-header ${scrolled ? "scrolled" : ""} ${darkTop ? "over-dark" : ""}`}>
-    <a className="brand" href="/" aria-label="STUDIO AE home">STUDIO<span>/AE</span></a>
+    <Link className="brand" href="/" aria-label="STUDIO AE home">STUDIO<span>/AE</span></Link>
     <nav className={open ? "open" : ""} aria-label="Primary navigation">
       {navItems.map(([label, href]) => <a className={pathname===href?"active":""} key={href} href={href} onClick={() => setOpen(false)}>{label}</a>)}
     </nav>

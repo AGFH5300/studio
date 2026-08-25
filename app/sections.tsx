@@ -63,11 +63,14 @@ export function Builder() {
   const [quotePulse,setQuotePulse] = useState(false);
 
   useEffect(() => {
-    const preset = new URLSearchParams(window.location.search).get("plan");
-    if (preset === "starter") { setPages("2–5"); setDesign("Professional"); }
-    if (preset === "pro") { setPages("6–8"); setDesign("Premium"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","booking","payments"])); }
-    if (preset === "business") { setPages("9–12"); setDesign("Advanced Motion"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","form","crm"])); }
-    if (preset === "signature") { setPages("13–20"); setDesign("Signature Art Direction"); setContent(new Set(["cms","portfolio"])); setBusiness(new Set(["whatsapp","form","crm"])); }
+    const frame=requestAnimationFrame(()=>{
+      const preset = new URLSearchParams(window.location.search).get("plan");
+      if (preset === "starter") { setPages("2–5"); setDesign("Professional"); }
+      if (preset === "pro") { setPages("6–8"); setDesign("Premium"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","booking","payments"])); }
+      if (preset === "business") { setPages("9–12"); setDesign("Advanced Motion"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","form","crm"])); }
+      if (preset === "signature") { setPages("13–20"); setDesign("Signature Art Direction"); setContent(new Set(["cms","portfolio"])); setBusiness(new Set(["whatsapp","form","crm"])); }
+    });
+    return()=>cancelAnimationFrame(frame);
   }, []);
 
   const toggle = (group:"content"|"business"|"ai", id:string) => {
@@ -128,7 +131,7 @@ export function Builder() {
     ai.forEach(id => raw+=aiCosts[id]||0);
 
     return Math.round(raw);
-  },[website,pages,design,content,business,ai,recommendation]);
+  },[website,pages,design,content,business,ai]);
 
   const chosen=[...content,...business,...ai];
   const labels:Record<string,string>={}; [...contentOptions,...businessOptions,...aiOptions].forEach(o=>labels[o[0]]=o[1]);
@@ -140,32 +143,45 @@ export function Builder() {
     window.location.assign("/contact");
   };
   const phases=["Website","Pages","Design","Content","Features","AI"];
-  const renderOptions=(items:OptionTuple[],group:"content"|"business"|"ai",set:Set<string>)=><div className="toggle-grid">{items.map(([id,label,note])=><button type="button" key={id} className={`toggle-option ${set.has(id)?"active":""}`} aria-pressed={set.has(id)} onClick={()=>toggle(group,id)}><span className="toggle-box">{set.has(id)?"✓":""}</span><strong>{label}</strong><small>{note}</small>{((id==="cms"&&(content.has("blog")||business.has("ecommerce")))||(id==="payments"&&business.has("ecommerce"))||(id==="login"&&business.has("dashboard"))||(id==="crm"&&(ai.has("qualification")||ai.has("workflow"))))&&<em>AUTO</em>}</button>)}</div>;
+  const phaseAnswers=[website,pages,design,content.size?`${content.size} selected`:"Optional",business.size?`${business.size} selected`:"Optional",ai.size?`${ai.size} selected`:"Optional"];
+  const dependencyNotes=[
+    content.has("blog")&&"CMS is included because Blog / News needs editable content.",
+    business.has("ecommerce")&&"CMS and online payments are included with Ecommerce.",
+    business.has("dashboard")&&"Customer login is included with a Customer dashboard.",
+    (ai.has("qualification")||ai.has("workflow"))&&"CRM is included so qualified leads have a destination.",
+  ].filter(Boolean) as string[];
+  const renderOptions=(items:OptionTuple[],group:"content"|"business"|"ai",set:Set<string>)=><div className="toggle-grid">{items.map(([id,label,note])=><button type="button" key={id} className={`toggle-option ${set.has(id)?"active":""}`} aria-pressed={set.has(id)} onClick={()=>toggle(group,id)}><span className="toggle-box" aria-hidden="true">{set.has(id)?"✓":""}</span><strong>{label}</strong><small>{note}</small>{((id==="cms"&&(content.has("blog")||business.has("ecommerce")))||(id==="payments"&&business.has("ecommerce"))||(id==="login"&&business.has("dashboard"))||(id==="crm"&&(ai.has("qualification")||ai.has("workflow"))))&&<em>AUTO-ADDED</em>}</button>)}</div>;
 
   return <section className="builder-section section-pad" id="builder">
-    <div className="builder-heading"><div className="section-kicker light"><span>INTERACTIVE ESTIMATE</span><i /></div><h2>Build Your Website</h2><p>Tell us what you need. See an instant estimate.</p></div>
+    <div className="builder-heading"><div className="section-kicker light"><span>YOUR SCOPE, PRICED LIVE</span><i /></div><h2>Build your website.</h2><p>Six focused decisions. One useful starting point.</p></div>
     <div className="builder-shell">
       <div className="builder-main">
-        <div className="builder-progress">{phases.map((x,i)=><button key={x} className={`${step===i+1?"active":""} ${step>i+1?"done":""}`} onClick={()=>setStep(i+1)}><span>{step>i+1?"✓":i+1}</span><small>{x}</small></button>)}</div>
+        <div className="builder-progress-wrap">
+          <div className="builder-progress-meta"><span>PROJECT ESTIMATOR</span><b>{step} of 6</b><small>About 2 minutes</small></div>
+          <div className="builder-progress" aria-label="Estimator progress">{phases.map((x,i)=><button type="button" key={x} className={`${step===i+1?"active":""} ${step>i+1?"done":""}`} aria-current={step===i+1?"step":undefined} onClick={()=>setStep(i+1)}><span>{step>i+1?"✓":`0${i+1}`}</span><span><strong>{x}</strong><small>{phaseAnswers[i]}</small></span></button>)}</div>
+          <div className="progress-line" aria-hidden="true"><i style={{width:`${((step-1)/5)*100}%`}}/></div>
+        </div>
         <div className="builder-panel">
-          {step===1&&<><div className="step-title"><small>STEP 01 / 06</small><h3>What are we building?</h3><p>Pick the closest fit. We&apos;ll refine it together later.</p></div><div className="choice-grid website-types">{websiteTypes.map(x=><button key={x} className={website===x?"selected":""} onClick={()=>chooseWebsite(x)}><span>{x}</span><i>{website===x?"✓":"↗"}</i></button>)}</div></>}
-          {step===2&&<><div className="step-title"><small>STEP 02 / 06</small><h3>How many core pages?</h3><p>Count unique layouts such as Home, About, Services and Contact—not every blog post or product.</p></div><div className="choice-grid page-choices">{pageOptions.map((x,i)=><button key={x} className={pages===x?"selected":""} onClick={()=>setPages(x)}><b>{x}</b><span>{pageNotes[i]}</span></button>)}</div></>}
-          {step===3&&<><div className="step-title"><small>STEP 03 / 06</small><h3>Choose the design ambition.</h3><p>Every level is custom and polished. Higher levels add creative depth—not a completely different website.</p></div><div className="design-choices">{designOptions.map((x,i)=><button key={x.name} className={design===x.name?"selected":""} onClick={()=>setDesign(x.name)}><small>0{i+1}</small><div><strong>{x.name}</strong><span>{x.note}</span></div><i>{design===x.name?"✓":"↗"}</i></button>)}</div></>}
-          {step===4&&<><div className="step-title"><small>STEP 04 / 06</small><h3>Content that stays useful.</h3><p>Select what you want to publish, manage or translate.</p></div>{renderOptions(contentOptions,"content",content)}</>}
-          {step===5&&<><div className="step-title"><small>STEP 05 / 06</small><h3>Make the website work.</h3><p>Add the practical features that turn visits into action.</p></div>{renderOptions(businessOptions,"business",business)}</>}
-          {step===6&&<><div className="step-title"><small>STEP 06 / 06</small><h3>Add intelligence—where it helps.</h3><p>These are product concepts for now. Third-party and usage costs are separate.</p></div>{renderOptions(aiOptions,"ai",ai)}<div className="automation-demo"><small>EXAMPLE FLOW</small><div><span>Enquiry</span><i>→</i><span>AI qualification</span><i>→</i><span>CRM</span><i>→</i><span>Sales follow-up</span></div></div></>}
+          <div className="step-content" key={step}>
+            {step===1&&<><div className="step-title"><small>FIRST, THE FORMAT</small><h3>What are we building?</h3><p>Choose the closest fit. This shapes the questions that follow—it does not lock you into a package.</p></div><div className="choice-grid website-types">{websiteTypes.map((x,i)=><button type="button" key={x} className={website===x?"selected":""} aria-pressed={website===x} onClick={()=>chooseWebsite(x)}><span className="choice-number">0{i+1}</span><span className="choice-visual" aria-hidden="true"><i/><i/><i/></span><strong>{x}</strong><b>{website===x?"Selected":"Choose"} <i>{website===x?"✓":"↗"}</i></b></button>)}</div></>}
+            {step===2&&<><div className="step-title"><small>NOW, THE SCALE</small><h3>How many core pages?</h3><p>Count unique layouts such as Home, About, Services and Contact—not every article or product.</p></div><div className="choice-grid page-choices">{pageOptions.map((x,i)=><button type="button" key={x} className={pages===x?"selected":""} aria-pressed={pages===x} onClick={()=>setPages(x)}><span className="choice-number">0{i+1}</span><b>{x}</b><span>{pageNotes[i]}</span><i>{pages===x?"✓":""}</i></button>)}</div></>}
+            {step===3&&<><div className="step-title"><small>SET THE CREATIVE AMBITION</small><h3>How distinctive should it feel?</h3><p>Every level is custom and polished. You pay for the creative depth you choose—not a higher package minimum.</p></div><div className="design-choices">{designOptions.map((x,i)=><button type="button" key={x.name} className={design===x.name?"selected":""} aria-pressed={design===x.name} onClick={()=>setDesign(x.name)}><small>0{i+1}</small><span className={`motion-swatch swatch-${i+1}`} aria-hidden="true"><i/><i/><i/></span><div><strong>{x.name}</strong><span>{x.note}</span></div><i>{design===x.name?"✓":"↗"}</i></button>)}</div></>}
+            {step===4&&<><div className="step-title"><small>CONTENT &amp; LANGUAGES</small><h3>What should stay editable?</h3><p>Add only what the business will genuinely use. Dependencies are handled automatically.</p></div>{renderOptions(contentOptions,"content",content)}</>}
+            {step===5&&<><div className="step-title"><small>BUSINESS FEATURES</small><h3>What should the site do?</h3><p>Select the actions, integrations and tools that turn a website into a working business system.</p></div>{renderOptions(businessOptions,"business",business)}</>}
+            {step===6&&<><div className="step-title"><small>AI &amp; AUTOMATION</small><h3>Where would intelligence help?</h3><p>Choose practical modules, not AI for show. Third-party subscriptions and usage remain separate.</p></div>{renderOptions(aiOptions,"ai",ai)}<div className="automation-demo"><small>ONE POSSIBLE FLOW</small><div><span>Enquiry</span><i>→</i><span>AI qualification</span><i>→</i><span>CRM</span><i>→</i><span>Sales follow-up</span></div></div></>}
+          </div>
+          {dependencyNotes.length>0&&step>=4&&<div className="dependency-note" aria-live="polite"><span>AUTOMATIC LOGIC</span><p>{dependencyNotes[dependencyNotes.length-1]}</p><i>✓</i></div>}
           <div className="builder-nav"><button onClick={()=>setStep(Math.max(1,step-1))} disabled={step===1}>← Back</button>{step<6?<button className="next" onClick={()=>setStep(step+1)}>Continue <span>→</span></button>:<button className="next" onClick={()=>document.querySelector(".live-quote")?.scrollIntoView({behavior:"smooth",block:"center"})}>Review estimate <span>↗</span></button>}</div>
         </div>
       </div>
       <aside className={`live-quote ${quotePulse?"pulse":""}`}>
-        <div className="quote-label"><span>LIVE ESTIMATE</span><i>●</i></div>
-        <h3>Your website</h3>
-        <div className="quote-basics"><p><span>Type</span><strong>{website}</strong></p><p><span>Pages</span><strong>{pages}</strong></p><p><span>Design</span><strong>{design}</strong></p></div>
-        <div className="quote-features"><span>SELECTED FEATURES</span><div>{chosen.length?chosen.slice(0,8).map(x=><small key={x}>{labels[x]}</small>):<p>Choose features to refine your estimate.</p>}{chosen.length>8&&<small>+{chosen.length-8} more</small>}</div></div>
-        <div className="quote-price"><small>Estimated project</small><strong>AED {formatAED(estimate)}</strong></div>
-        <div className="recommendation"><small>{recommendation.name==="CUSTOM CONFIGURATION"?"PRICING METHOD":"CLOSEST PACKAGE"}</small><span>{recommendation.name}</span><strong>{recommendation.custom?"SCOPE REVIEW":"ITEM-BY-ITEM"}</strong><em>Calculated from your selected scope—not a package minimum</em></div>
+        <div className="quote-label"><span>YOUR LIVE SCOPE</span><i><b/> UPDATES INSTANTLY</i></div>
+        <div className="quote-price"><small>Indicative project estimate</small><strong><span>AED</span> {formatAED(estimate)}</strong><p>No item prices are exposed. The total updates from the exact scope you choose.</p></div>
+        <div className="quote-basics"><button type="button" onClick={()=>setStep(1)}><span>Website</span><strong>{website}</strong><i>EDIT</i></button><button type="button" onClick={()=>setStep(2)}><span>Pages</span><strong>{pages}</strong><i>EDIT</i></button><button type="button" onClick={()=>setStep(3)}><span>Design</span><strong>{design}</strong><i>EDIT</i></button></div>
+        <div className="quote-features"><span>INCLUDED IN THIS SCOPE <b>{chosen.length}</b></span><div>{chosen.length?chosen.slice(0,6).map(x=><small key={x}>{labels[x]}</small>):<p>Add content, business or AI features to refine the estimate.</p>}{chosen.length>6&&<small>+{chosen.length-6} more</small>}</div></div>
+        <div className="recommendation"><small>{recommendation.name==="CUSTOM CONFIGURATION"?"PRICING APPROACH":"CLOSEST STARTING POINT"}</small><span>{recommendation.name}</span><strong>{recommendation.custom?"SCOPE REVIEW":"MODULAR SCOPE"}</strong><em>Your choices set the price. The package name is a reference—not a minimum.</em></div>
         <button className="quote-cta" onClick={submitConfig}>Get this website <span>↗</span></button>
-        <p className="quote-foot">Indicative prototype estimate. Final pricing follows a scope review.</p>
+        <p className="quote-foot">Indicative estimate · Final pricing follows a concise scope review · Third-party fees are separate</p>
       </aside>
     </div>
   </section>;
