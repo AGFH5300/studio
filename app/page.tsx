@@ -1,3 +1,5 @@
+import { SiteShowcase } from "./site-showcase";
+
 const work = [
   { name: "Ritual House", type: "Wellness / Ecommerce", className: "ritual", tag: "CONCEPT 01", line: "Small rituals. Better days." },
   { name: "Atelier N°8", type: "Architecture / Editorial", className: "atelier", tag: "CONCEPT 02", line: "Space, shaped with intent." },
@@ -12,6 +14,7 @@ export default function Home() {
         <div className="hero-grid" aria-hidden="true"><i /><i /><i /><i /></div>
         <div className="eyebrow reveal"><span /> UAE WEB DESIGN + DIGITAL SYSTEMS</div>
         <h1 className="hero-title reveal"><span>Beautiful websites.</span><span className="hero-serif">Built to do <em>business.</em></span></h1>
+        <SiteShowcase />
         <div className="hero-bottom reveal">
           <p>Design, development, ecommerce, SEO and intelligent automation for ambitious UAE businesses.</p>
           <div className="hero-actions"><a className="button button-dark" href="/build">Build your website <b>↗</b></a><a className="text-link" href="/work">View selected concepts <span>↗</span></a></div>
