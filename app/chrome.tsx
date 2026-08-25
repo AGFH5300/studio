@@ -16,6 +16,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -24,13 +25,16 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(()=>{setDark(document.documentElement.dataset.theme==="dark")},[]);
+  const toggleTheme=()=>{const next=!dark;setDark(next);document.documentElement.dataset.theme=next?"dark":"light";localStorage.setItem("studio-theme",next?"dark":"light")};
+
   const darkTop = ["/work","/build","/contact"].includes(pathname);
   return <header className={`site-header ${scrolled ? "scrolled" : ""} ${darkTop ? "over-dark" : ""}`}>
     <a className="brand" href="/" aria-label="STUDIO AE home">STUDIO<span>/AE</span></a>
     <nav className={open ? "open" : ""} aria-label="Primary navigation">
       {navItems.map(([label, href]) => <a className={pathname===href?"active":""} key={href} href={href} onClick={() => setOpen(false)}>{label}</a>)}
     </nav>
-    <a className="header-cta" href="/contact">Start a project <span>↗</span></a>
+    <div className="header-actions"><button className="theme-toggle" onClick={toggleTheme} aria-label={`Switch to ${dark?"light":"dark"} mode`}><i>{dark?"☼":"◐"}</i><span>{dark?"Light":"Dark"}</span></button><a className="header-cta" href="/contact">Start a project <span>↗</span></a></div>
     <button className="menu-button" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}><i /><i /></button>
   </header>;
 }
