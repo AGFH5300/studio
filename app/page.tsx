@@ -25,14 +25,6 @@ export default function Home() {
         {[["01", "Custom design", "Never off-the-shelf"],["02", "Clear pricing", "From AED 999"],["03", "Search ready", "SEO + AEO foundations"],["04", "Built to grow", "CMS, commerce + AI"]].map(([num, title, text]) => <div className="signal" key={num}><small>{num}</small><strong>{title}</strong><span>{text}</span></div>)}
       </section>
 
-      <section className="visual-manifesto section-pad" aria-labelledby="visual-manifesto-title">
-        <div className="visual-manifesto-head"><div className="section-kicker"><span>DESIGNED TO BE REMEMBERED</span><i /></div><h2 id="visual-manifesto-title">A website should have<br/><em>a visual point of view.</em></h2><p>Not decoration for decoration&apos;s sake. A distinctive graphic language makes the offer easier to recognise, easier to trust and harder to forget.</p></div>
-        <div className="visual-panels">
-          <article className="visual-panel systems-panel"><div className="panel-index">01 / BRAND SYSTEM</div><img src="/graphics/systems-sculpture.webp" alt="A colourful modular sculpture representing connected digital services"/><div className="panel-caption"><strong>One visual language.</strong><span>Across every page, interaction and screen.</span></div></article>
-          <article className="visual-panel growth-panel"><div className="panel-index">02 / BUILT TO GROW</div><img src="/graphics/growth-sculpture.webp" alt="An abstract sculptural pathway representing business growth"/><div className="panel-caption"><strong>More than a homepage.</strong><span>A system that can expand with the business.</span></div></article>
-        </div>
-      </section>
-
       <section className="intro section-pad" id="about">
         <div className="section-kicker"><span>WHY WE EXIST</span><i /></div>
         <div className="intro-copy"><h2>A better website shouldn&apos;t require a <span>bigger agency.</span></h2><div><p>We combine agency-grade creative direction with a modern, efficient build process. You get a site that feels considered, works hard, and costs what it should.</p><a className="arrow-link" href="/services">See what we build <span>↗</span></a></div></div>
