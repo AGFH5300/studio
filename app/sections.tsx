@@ -58,7 +58,7 @@ export function Builder() {
   const [pages,setPages] = useState("2–5");
   const [design,setDesign] = useState("Professional");
   const [content,setContent] = useState(new Set<string>());
-  const [business,setBusiness] = useState(new Set<string>(["whatsapp"]));
+  const [business,setBusiness] = useState(new Set<string>());
   const [ai,setAi] = useState(new Set<string>());
   const [quotePulse,setQuotePulse] = useState(false);
 
@@ -143,7 +143,6 @@ export function Builder() {
     window.location.assign("/contact");
   };
   const phases=["Website","Pages","Design","Content","Features","AI"];
-  const phaseAnswers=[website,pages,design,content.size?`${content.size} selected`:"Optional",business.size?`${business.size} selected`:"Optional",ai.size?`${ai.size} selected`:"Optional"];
   const dependencyNotes=[
     content.has("blog")&&"CMS is included because Blog / News needs editable content.",
     business.has("ecommerce")&&"CMS and online payments are included with Ecommerce.",
@@ -158,7 +157,7 @@ export function Builder() {
       <div className="builder-main">
         <div className="builder-progress-wrap">
           <div className="builder-progress-meta"><span>PROJECT ESTIMATOR</span><b>{step} of 6</b><small>About 2 minutes</small></div>
-          <div className="builder-progress" aria-label="Estimator progress">{phases.map((x,i)=><button type="button" key={x} className={`${step===i+1?"active":""} ${step>i+1?"done":""}`} aria-current={step===i+1?"step":undefined} onClick={()=>setStep(i+1)}><span>{step>i+1?"✓":`0${i+1}`}</span><span><strong>{x}</strong><small>{phaseAnswers[i]}</small></span></button>)}</div>
+          <div className="builder-progress" aria-label="Estimator progress">{phases.map((x,i)=><button type="button" key={x} className={`${step===i+1?"active":""} ${step>i+1?"done":""}`} aria-label={`${x}, step ${i+1} of 6`} aria-current={step===i+1?"step":undefined} onClick={()=>setStep(i+1)}><span>{step>i+1?"✓":i+1}</span><strong>{x}</strong></button>)}</div>
           <div className="progress-line" aria-hidden="true"><i style={{width:`${((step-1)/5)*100}%`}}/></div>
         </div>
         <div className="builder-panel">
