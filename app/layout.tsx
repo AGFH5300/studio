@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SiteFooter, SiteHeader } from "./chrome";
+import { MotionSystem } from "./effects";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://studio-ae-prototype.anvamarinedmc.chatgpt.site"),
@@ -11,4 +12,6 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "STUDIO/AE — Websites Built to Do Business", description: "Beautiful websites from AED 999. Built in the UAE, designed for anywhere.", images: ["/og.png"] },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en"><body><SiteHeader />{children}<SiteFooter /></body></html>; }
+const themeScript=`(()=>{try{const saved=localStorage.getItem('studio-theme');const system=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=saved||(system?'dark':'light')}catch{document.documentElement.dataset.theme='light'}})()`;
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{__html:themeScript}} /></head><body><SiteHeader /><MotionSystem />{children}<SiteFooter /></body></html>; }
