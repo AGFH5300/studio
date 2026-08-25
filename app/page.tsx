@@ -1,4 +1,4 @@
-import { KineticHero } from "./effects";
+import { KineticHero } from "./hero-engine";
 
 const work = [
   { name: "Ritual House", type: "Wellness / Ecommerce", className: "ritual", tag: "CONCEPT 01", line: "Small rituals. Better days." },
