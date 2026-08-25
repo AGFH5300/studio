@@ -87,6 +87,7 @@ html[data-theme="dark"] .studio-standard{background:#090a09}html[data-theme="dar
 /* Estimator product pass: focused decisions, visible system feedback, calmer quote. */
 @font-face{font-family:"Bricolage Grotesque Variable";src:url("/fonts/bricolage-grotesque-latin.woff2") format("woff2");font-style:normal;font-weight:200 800;font-display:swap}
 @font-face{font-family:"Instrument Serif";src:url("/fonts/instrument-serif-latin.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:"Instrument Serif";src:url("/fonts/instrument-serif-latin-italic.woff2") format("woff2");font-style:italic;font-weight:400;font-display:swap}
 :root{--display:"Bricolage Grotesque Variable",Arial,sans-serif;--serif:"Instrument Serif",Georgia,serif;--sans:"Bricolage Grotesque Variable",Arial,sans-serif}
 h1,h2,h3,.brand,.footer-brand,.builder-panel strong,.quote-price strong{font-family:var(--display)}
 .hero-title,.builder-heading h2,.step-title h3{font-optical-sizing:auto;font-variation-settings:"wdth" 92,"opsz" 72}.hero-title{letter-spacing:-.058em}.hero-serif,.hero-serif em{font-family:var(--serif);font-variation-settings:normal}.builder-heading h2{letter-spacing:-.052em}.step-title h3{letter-spacing:-.04em}
