@@ -1,24 +1,19 @@
 import { SiteShowcase } from "./site-showcase";
 
-const work = [
-  { name: "Ritual House", type: "Wellness / Ecommerce", className: "ritual", tag: "CONCEPT 01", line: "Small rituals. Better days." },
-  { name: "Atelier N°8", type: "Architecture / Editorial", className: "atelier", tag: "CONCEPT 02", line: "Space, shaped with intent." },
-  { name: "Serein", type: "Hospitality / Booking", className: "serein", tag: "CONCEPT 03", line: "An evening worth keeping." },
-  { name: "NOMA Systems", type: "Technology / B2B", className: "noma", tag: "CONCEPT 04", line: "Make complexity useful." },
-];
-
 export default function Home() {
   return (
     <main>
       <section className="hero" id="top">
         <div className="hero-grid" aria-hidden="true"><i /><i /><i /><i /></div>
-        <div className="eyebrow reveal"><span /> UAE WEB DESIGN + DIGITAL SYSTEMS</div>
-        <h1 className="hero-title reveal"><span>Beautiful websites.</span><span className="hero-serif">Built to do <em>business.</em></span></h1>
-        <SiteShowcase />
-        <div className="hero-bottom reveal">
-          <p>Design, development, ecommerce, SEO and intelligent automation for ambitious UAE businesses.</p>
-          <div className="hero-actions"><a className="button button-dark" href="/build">Build your website <b>↗</b></a><a className="text-link" href="/work">View selected concepts <span>↗</span></a></div>
+        <div className="hero-copy">
+          <div className="eyebrow reveal"><span /> UAE WEB DESIGN + DIGITAL SYSTEMS</div>
+          <h1 className="hero-title reveal"><span>Beautiful websites.</span><span className="hero-serif">Built to do <em>business.</em></span></h1>
+          <div className="hero-bottom reveal">
+            <p>Design, development, ecommerce, SEO and intelligent automation for ambitious UAE businesses.</p>
+            <div className="hero-actions"><a className="button button-dark" href="/build">Build your website <b>↗</b></a><a className="text-link" href="/services">See what we build <span>↗</span></a></div>
+          </div>
         </div>
+        <SiteShowcase />
       </section>
 
       <section className="signal-strip" aria-label="Key benefits">
@@ -30,21 +25,12 @@ export default function Home() {
         <div className="intro-copy"><h2>A better website shouldn&apos;t require a <span>bigger agency.</span></h2><div><p>We combine agency-grade creative direction with a modern, efficient build process. You get a site that feels considered, works hard, and costs what it should.</p><a className="arrow-link" href="/services">See what we build <span>↗</span></a></div></div>
       </section>
 
-      <section className="work-section section-pad" id="work">
-        <div className="section-heading"><div><div className="section-kicker light"><span>SELECTED CONCEPTS</span><i /></div><h2>Four industries.<br/><em>Four points of view.</em></h2></div><p>Original concept work created to show the range of what your next website could become. No invented clients. Just a clear demonstration of craft.</p></div>
-        <div className="work-grid">
-          {work.map((item, index) => <article className={`work-card ${item.className}`} key={item.name} tabIndex={0}>
-            <div className="concept-bar"><span>{item.tag}</span><span>{item.type}</span></div>
-            <div className="concept-canvas">
-              {index === 0 && <><div className="mini-nav">Ritual House <span>SHOP&nbsp;&nbsp; JOURNAL&nbsp;&nbsp; CART (0)</span></div><div className="ritual-art"><i/><i/><i/></div></>}
-              {index === 1 && <><div className="atelier-num">08</div><div className="atelier-frame"><span>SELECTED<br/>SPACES</span><i/></div></>}
-              {index === 2 && <><div className="serein-mark">S</div><div className="serein-meta">DUBAI · 25.2048° N</div></>}
-              {index === 3 && <><div className="noma-grid"><i/><i/><i/><i/><i/><i/></div><div className="noma-status">SYSTEMS ONLINE <span/></div></>}
-              <div className="concept-copy"><small>{item.name}</small><strong>{item.line}</strong></div>
-            </div>
-            <div className="concept-footer"><span>{item.type}</span><a href="/work">View concept <i>↗</i></a></div>
-          </article>)}
+      <section className="studio-standard section-pad" aria-labelledby="standard-title">
+        <div className="section-heading"><div><div className="section-kicker light"><span>THE STUDIO STANDARD</span><i /></div><h2 id="standard-title">Professional isn&apos;t a look.<br/><em>It&apos;s a system.</em></h2></div><p>Every build follows the same quality framework—from the first business goal to the final responsive detail.</p></div>
+        <div className="standard-flow" aria-label="Our website quality framework">
+          {[["01","Direction","Goals, audience and the action your website needs to earn."],["02","Structure","Clear journeys, content hierarchy and search-ready architecture."],["03","Interface","A distinctive responsive design system with purposeful motion."],["04","Engineering","Fast, accessible implementation with the right integrations."],["05","Launch","Testing, analytics, indexing, handover and post-launch support."]].map(([number,title,copy])=><article key={number}><small>{number}</small><h3>{title}</h3><p>{copy}</p><span aria-hidden="true">↗</span></article>)}
         </div>
+        <div className="quality-rail"><span>RESPONSIVE BY DEFAULT</span><span>SEARCH STRUCTURED</span><span>ACCESSIBILITY CONSIDERED</span><span>PERFORMANCE BUDGETED</span></div>
       </section>
 
       <section className="services-preview section-pad" id="services">

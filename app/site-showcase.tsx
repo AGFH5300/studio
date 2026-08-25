@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 const modes = [
   { id: "brand", label: "BRAND", title: "Ritual House", meta: "Wellness · Ecommerce" },
@@ -14,12 +14,6 @@ type Mode = (typeof modes)[number]["id"];
 export function SiteShowcase() {
   const [active, setActive] = useState(0);
   const stage = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = window.setInterval(() => setActive((value) => (value + 1) % modes.length), 4200);
-    return () => window.clearInterval(timer);
-  }, []);
 
   function move(event: React.PointerEvent<HTMLDivElement>) {
     const node = stage.current;
@@ -44,14 +38,13 @@ export function SiteShowcase() {
       ref={stage}
       onPointerMove={move}
       onPointerLeave={reset}
-      aria-label="Interactive concept website demonstration"
+      aria-label="Interactive website capability demonstration"
     >
-      <div className="showcase-note"><i /> INTERACTIVE CONCEPT</div>
       <div className={`showcase-browser mode-${mode.id}`}>
         <div className="showcase-chrome">
           <span><i /><i /><i /></span>
-          <b>studio-ae.com / concept</b>
-          <em>LIVE</em>
+          <b>studio-ae.com / capability-demo</b>
+          <em>DEMO</em>
         </div>
         <div className="showcase-screen" key={mode.id}>
           <div className="screen-nav"><strong>{mode.title}</strong><span>ABOUT&nbsp;&nbsp; SERVICES&nbsp;&nbsp; CONTACT</span></div>
@@ -59,14 +52,8 @@ export function SiteShowcase() {
           {mode.id === "book" && <BookingScene />}
           {mode.id === "sell" && <ServicesScene />}
           {mode.id === "automate" && <AutomationScene />}
-          <div className="screen-caption"><small>{mode.meta}</small><b>View concept ↗</b></div>
+          <div className="screen-caption"><small>{mode.meta}</small><b>STUDIO PROTOTYPE</b></div>
         </div>
-      </div>
-      <div className={`showcase-phone mode-${mode.id}`} aria-hidden="true">
-        <span />
-        <div className="phone-mark">{mode.title.slice(0, 1)}</div>
-        <small>{mode.label}</small>
-        <i />
       </div>
       <div className="showcase-controls" role="tablist" aria-label="Concept capabilities">
         {modes.map((item, index) => (
