@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 const formatAED = (value: number) => new Intl.NumberFormat("en-AE").format(value);
 
@@ -61,6 +61,7 @@ export function Builder() {
   const [business,setBusiness] = useState(new Set<string>());
   const [ai,setAi] = useState(new Set<string>());
   const [quotePulse,setQuotePulse] = useState(false);
+  const websiteAuto = useRef<{content:Set<string>;business:Set<string>}>({content:new Set(),business:new Set()});
 
   useEffect(() => {
     const frame=requestAnimationFrame(()=>{
@@ -136,7 +137,22 @@ export function Builder() {
   const chosen=[...content,...business,...ai];
   const labels:Record<string,string>={}; [...contentOptions,...businessOptions,...aiOptions].forEach(o=>labels[o[0]]=o[1]);
 
-  const chooseWebsite=(value:string)=>{setWebsite(value);if(value==="Ecommerce"){setContent(p=>new Set(p).add("cms"));setBusiness(p=>{const n=new Set(p);n.add("ecommerce");n.add("payments");return n})}if(value==="Booking Website")setBusiness(p=>new Set(p).add("booking"));};
+  const chooseWebsite=(value:string)=>{
+    const nextContent=new Set(content); const nextBusiness=new Set(business);
+    websiteAuto.current.content.forEach(id=>nextContent.delete(id));
+    websiteAuto.current.business.forEach(id=>nextBusiness.delete(id));
+    const autoContent=new Set<string>(); const autoBusiness=new Set<string>();
+    const addContent=(id:string)=>{if(!nextContent.has(id))autoContent.add(id);nextContent.add(id)};
+    const addBusiness=(id:string)=>{if(!nextBusiness.has(id))autoBusiness.add(id);nextBusiness.add(id)};
+    if(value==="Ecommerce"){addContent("cms");addBusiness("ecommerce");addBusiness("payments")}
+    if(value==="Booking Website")addBusiness("booking");
+    if(nextContent.has("blog"))nextContent.add("cms");
+    if(nextBusiness.has("ecommerce")){nextContent.add("cms");nextBusiness.add("payments")}
+    if(nextBusiness.has("dashboard"))nextBusiness.add("login");
+    if(ai.has("qualification")||ai.has("workflow"))nextBusiness.add("crm");
+    websiteAuto.current={content:autoContent,business:autoBusiness};
+    setWebsite(value);setContent(nextContent);setBusiness(nextBusiness);
+  };
   const submitConfig=()=>{
     const detail={website,pages,design,features:chosen.map(x=>labels[x]),estimate,recommendation:recommendation.name};
     window.sessionStorage.setItem("studioConfig", JSON.stringify(detail));
