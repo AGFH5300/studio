@@ -61,18 +61,40 @@ export function Builder() {
   const [business,setBusiness] = useState(new Set<string>());
   const [ai,setAi] = useState(new Set<string>());
   const [quotePulse,setQuotePulse] = useState(false);
+  const [hydrated,setHydrated] = useState(false);
   const websiteAuto = useRef<{content:Set<string>;business:Set<string>}>({content:new Set(),business:new Set()});
 
   useEffect(() => {
     const frame=requestAnimationFrame(()=>{
       const preset = new URLSearchParams(window.location.search).get("plan");
-      if (preset === "starter") { setPages("2–5"); setDesign("Professional"); }
-      if (preset === "pro") { setPages("6–8"); setDesign("Premium"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","booking","payments"])); }
-      if (preset === "business") { setPages("9–12"); setDesign("Advanced Motion"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","form","crm"])); }
-      if (preset === "signature") { setPages("13–20"); setDesign("Signature Art Direction"); setContent(new Set(["cms","portfolio"])); setBusiness(new Set(["whatsapp","form","crm"])); }
+      if (preset === "starter") { setPages("2–5"); setDesign("Professional"); setContent(new Set()); setBusiness(new Set()); setAi(new Set()); }
+      else if (preset === "pro") { setPages("6–8"); setDesign("Premium"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","booking","payments"])); setAi(new Set()); }
+      else if (preset === "business") { setPages("9–12"); setDesign("Advanced Motion"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","form","crm"])); setAi(new Set()); }
+      else if (preset === "signature") { setPages("13–20"); setDesign("Signature Art Direction"); setContent(new Set(["cms","portfolio"])); setBusiness(new Set(["whatsapp","form","crm"])); setAi(new Set()); }
+      else {
+        try {
+          const saved=window.sessionStorage.getItem("studioBuilderDraft");
+          if(saved){
+            const draft=JSON.parse(saved);
+            if(websiteTypes.includes(draft.website))setWebsite(draft.website);
+            if(pageOptions.includes(draft.pages))setPages(draft.pages);
+            if(designOptions.some(option=>option.name===draft.design))setDesign(draft.design);
+            if(Array.isArray(draft.content))setContent(new Set(draft.content));
+            if(Array.isArray(draft.business))setBusiness(new Set(draft.business));
+            if(Array.isArray(draft.ai))setAi(new Set(draft.ai));
+            if(Number.isInteger(draft.step))setStep(Math.min(6,Math.max(1,draft.step)));
+          }
+        } catch {}
+      }
+      setHydrated(true);
     });
     return()=>cancelAnimationFrame(frame);
   }, []);
+
+  useEffect(()=>{
+    if(!hydrated)return;
+    window.sessionStorage.setItem("studioBuilderDraft",JSON.stringify({website,pages,design,content:[...content],business:[...business],ai:[...ai],step}));
+  },[hydrated,website,pages,design,content,business,ai,step]);
 
   const toggle = (group:"content"|"business"|"ai", id:string) => {
     const current = group === "content" ? content : group === "business" ? business : ai;
@@ -158,6 +180,15 @@ export function Builder() {
     window.sessionStorage.setItem("studioConfig", JSON.stringify(detail));
     window.location.assign("/contact");
   };
+  const goToStep=(nextStep:number)=>{
+    setStep(nextStep);
+    window.requestAnimationFrame(()=>document.querySelector(".builder-main")?.scrollIntoView({behavior:"smooth",block:"start"}));
+  };
+  const resetBuilder=()=>{
+    websiteAuto.current={content:new Set(),business:new Set()};
+    setWebsite("Business Website");setPages("2–5");setDesign("Professional");setContent(new Set());setBusiness(new Set());setAi(new Set());setStep(1);
+    window.sessionStorage.removeItem("studioBuilderDraft");window.sessionStorage.removeItem("studioConfig");
+  };
   const phases=["Website","Pages","Design","Content","Features","AI"];
   const dependencyNotes=[
     content.has("blog")&&"CMS is included because Blog / News needs editable content.",
@@ -173,7 +204,7 @@ export function Builder() {
       <div className="builder-main">
         <div className="builder-progress-wrap">
           <div className="builder-progress-meta"><span>PROJECT ESTIMATOR</span><b>{step} of 6</b><small>About 2 minutes</small></div>
-          <div className="builder-progress" aria-label="Estimator progress">{phases.map((x,i)=><button type="button" key={x} className={`${step===i+1?"active":""} ${step>i+1?"done":""}`} aria-label={`${x}, step ${i+1} of 6`} aria-current={step===i+1?"step":undefined} onClick={()=>setStep(i+1)}><span>{step>i+1?"✓":i+1}</span><strong>{x}</strong></button>)}</div>
+          <div className="builder-progress" aria-label="Estimator progress">{phases.map((x,i)=><button type="button" key={x} className={`${step===i+1?"active":""} ${step>i+1?"done":""}`} aria-label={`${x}, step ${i+1} of 6`} aria-current={step===i+1?"step":undefined} onClick={()=>goToStep(i+1)}><span>{step>i+1?"✓":i+1}</span><strong>{x}</strong></button>)}</div>
           <div className="progress-line" aria-hidden="true"><i style={{width:`${((step-1)/5)*100}%`}}/></div>
         </div>
         <div className="builder-panel">
@@ -186,16 +217,17 @@ export function Builder() {
             {step===6&&<><div className="step-title"><small>AI &amp; AUTOMATION</small><h3>Where would intelligence help?</h3><p>Choose practical modules, not AI for show. Third-party subscriptions and usage remain separate.</p></div>{renderOptions(aiOptions,"ai",ai)}<div className="automation-demo"><small>ONE POSSIBLE FLOW</small><div><span>Enquiry</span><i>→</i><span>AI qualification</span><i>→</i><span>CRM</span><i>→</i><span>Sales follow-up</span></div></div></>}
           </div>
           {dependencyNotes.length>0&&step>=4&&<div className="dependency-note" aria-live="polite"><span>AUTOMATIC LOGIC</span><p>{dependencyNotes[dependencyNotes.length-1]}</p><i>✓</i></div>}
-          <div className="builder-nav"><button onClick={()=>setStep(Math.max(1,step-1))} disabled={step===1}>← Back</button>{step<6?<button className="next" onClick={()=>setStep(step+1)}>Continue <span>→</span></button>:<button className="next" onClick={()=>document.querySelector(".live-quote")?.scrollIntoView({behavior:"smooth",block:"center"})}>Review estimate <span>↗</span></button>}</div>
+          <div className="builder-nav"><button onClick={()=>goToStep(Math.max(1,step-1))} disabled={step===1}>← Back</button>{step<6?<button className="next" onClick={()=>goToStep(step+1)}>Continue <span>→</span></button>:<button className="next" onClick={()=>document.querySelector(".live-quote")?.scrollIntoView({behavior:"smooth",block:"center"})}>Review estimate <span>↗</span></button>}</div>
         </div>
       </div>
       <aside className={`live-quote ${quotePulse?"pulse":""}`}>
         <div className="quote-label"><span>YOUR LIVE SCOPE</span><i><b/> UPDATES INSTANTLY</i></div>
         <div className="quote-price"><small>Indicative project estimate</small><strong><span>AED</span> {formatAED(estimate)}</strong><p>No item prices are exposed. The total updates from the exact scope you choose.</p></div>
-        <div className="quote-basics"><button type="button" onClick={()=>setStep(1)}><span>Website</span><strong>{website}</strong><i>EDIT</i></button><button type="button" onClick={()=>setStep(2)}><span>Pages</span><strong>{pages}</strong><i>EDIT</i></button><button type="button" onClick={()=>setStep(3)}><span>Design</span><strong>{design}</strong><i>EDIT</i></button></div>
+        <div className="quote-basics"><button type="button" onClick={()=>goToStep(1)}><span>Website</span><strong>{website}</strong><i>EDIT</i></button><button type="button" onClick={()=>goToStep(2)}><span>Pages</span><strong>{pages}</strong><i>EDIT</i></button><button type="button" onClick={()=>goToStep(3)}><span>Design</span><strong>{design}</strong><i>EDIT</i></button></div>
         <div className="quote-features"><span>INCLUDED IN THIS SCOPE <b>{chosen.length}</b></span><div>{chosen.length?chosen.slice(0,6).map(x=><small key={x}>{labels[x]}</small>):<p>Add content, business or AI features to refine the estimate.</p>}{chosen.length>6&&<small>+{chosen.length-6} more</small>}</div></div>
         <div className="recommendation"><small>{recommendation.name==="CUSTOM CONFIGURATION"?"PRICING APPROACH":"CLOSEST STARTING POINT"}</small><span>{recommendation.name}</span><strong>{recommendation.custom?"SCOPE REVIEW":"MODULAR SCOPE"}</strong><em>Your choices set the price. The package name is a reference—not a minimum.</em></div>
-        <button className="quote-cta" onClick={submitConfig}>Get this website <span>↗</span></button>
+        <button type="button" className="quote-cta" onClick={submitConfig}><span>Get this website</span><span aria-hidden="true">↗</span></button>
+        <button type="button" className="quote-reset" onClick={resetBuilder}>Start over</button>
         <p className="quote-foot">Indicative estimate · Final pricing follows a concise scope review · Third-party fees are separate</p>
       </aside>
     </div>
