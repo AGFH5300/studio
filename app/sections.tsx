@@ -24,7 +24,7 @@ export function Pricing() {
         <ul>{plan.summary.map(x => <li key={x}><span>✓</span>{x}</li>)}</ul>
         {expanded === plan.key && <ul className="extra-features">{plan.more.map(x => <li key={x}><span>＋</span>{x}</li>)}</ul>}
         <button className="details-button" onClick={() => setExpanded(expanded === plan.key ? null : plan.key)}>{expanded === plan.key ? "Hide details" : "See full scope"}<span>{expanded === plan.key ? "−" : "+"}</span></button>
-        <a href={`/build?plan=${plan.key}`} className="choose-plan">Build this website <span>↗</span></a>
+        <a href={`/build?plan=${plan.key}`} className="choose-plan">Choose &amp; customise <span>↗</span></a>
       </article>)}
     </div>
     <p className="price-note">Packages cover standard website implementation. Complex applications, major ecommerce, advanced 3D/WebGL and highly bespoke systems are scoped separately.</p>
@@ -51,6 +51,16 @@ const aiOptions = [
 ];
 
 type OptionTuple = string[];
+type PlanKey = "starter"|"pro"|"business"|"signature";
+type PlanPreset = {name:string;price:string;website:string;pages:string;design:string;content:string[];business:string[];ai:string[]};
+
+const planPresets:Record<PlanKey,PlanPreset> = {
+  starter:{name:"STARTER",price:"999",website:"Business Website",pages:"2–5",design:"Professional",content:[],business:["whatsapp"],ai:[]},
+  pro:{name:"PRO",price:"2,499",website:"Business Website",pages:"6–8",design:"Premium",content:["cms","blog"],business:["whatsapp","booking","payments"],ai:[]},
+  business:{name:"BUSINESS",price:"4,999",website:"Business Website",pages:"9–12",design:"Advanced Motion",content:["cms","blog"],business:["whatsapp","form","crm"],ai:[]},
+  signature:{name:"SIGNATURE",price:"9,999+",website:"Custom Digital Experience",pages:"13–20",design:"Signature Art Direction",content:["cms","portfolio"],business:["whatsapp","form","crm"],ai:[]},
+};
+const planKeys=Object.keys(planPresets) as PlanKey[];
 
 export function Builder() {
   const [step,setStep] = useState(1);
@@ -62,15 +72,25 @@ export function Builder() {
   const [ai,setAi] = useState(new Set<string>());
   const [quotePulse,setQuotePulse] = useState(false);
   const [hydrated,setHydrated] = useState(false);
+  const [startingPlan,setStartingPlan] = useState<PlanKey|null>(null);
+  const [showPlanReview,setShowPlanReview] = useState(false);
+  const [journeyDecision,setJourneyDecision] = useState("custom-build");
+  const [advisorDecision,setAdvisorDecision] = useState("");
   const websiteAuto = useRef<{content:Set<string>;business:Set<string>}>({content:new Set(),business:new Set()});
+
+  const applyPreset=(key:PlanKey)=>{
+    const preset=planPresets[key];
+    websiteAuto.current={content:new Set(),business:new Set()};
+    setWebsite(preset.website);setPages(preset.pages);setDesign(preset.design);
+    setContent(new Set(preset.content));setBusiness(new Set(preset.business));setAi(new Set(preset.ai));
+  };
 
   useEffect(() => {
     const frame=requestAnimationFrame(()=>{
       const preset = new URLSearchParams(window.location.search).get("plan");
-      if (preset === "starter") { setPages("2–5"); setDesign("Professional"); setContent(new Set()); setBusiness(new Set()); setAi(new Set()); }
-      else if (preset === "pro") { setPages("6–8"); setDesign("Premium"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","booking","payments"])); setAi(new Set()); }
-      else if (preset === "business") { setPages("9–12"); setDesign("Advanced Motion"); setContent(new Set(["cms","blog"])); setBusiness(new Set(["whatsapp","form","crm"])); setAi(new Set()); }
-      else if (preset === "signature") { setPages("13–20"); setDesign("Signature Art Direction"); setContent(new Set(["cms","portfolio"])); setBusiness(new Set(["whatsapp","form","crm"])); setAi(new Set()); }
+      if (preset&&planKeys.includes(preset as PlanKey)) {
+        const key=preset as PlanKey;applyPreset(key);setStartingPlan(key);setShowPlanReview(true);setJourneyDecision("package-selected");
+      }
       else {
         try {
           const saved=window.sessionStorage.getItem("studioBuilderDraft");
@@ -83,6 +103,9 @@ export function Builder() {
             if(Array.isArray(draft.business))setBusiness(new Set(draft.business));
             if(Array.isArray(draft.ai))setAi(new Set(draft.ai));
             if(Number.isInteger(draft.step))setStep(Math.min(6,Math.max(1,draft.step)));
+            if(planKeys.includes(draft.startingPlan))setStartingPlan(draft.startingPlan);
+            if(typeof draft.journeyDecision==="string")setJourneyDecision(draft.journeyDecision);
+            if(typeof draft.advisorDecision==="string")setAdvisorDecision(draft.advisorDecision);
           }
         } catch {}
       }
@@ -93,8 +116,8 @@ export function Builder() {
 
   useEffect(()=>{
     if(!hydrated)return;
-    window.sessionStorage.setItem("studioBuilderDraft",JSON.stringify({website,pages,design,content:[...content],business:[...business],ai:[...ai],step}));
-  },[hydrated,website,pages,design,content,business,ai,step]);
+    window.sessionStorage.setItem("studioBuilderDraft",JSON.stringify({website,pages,design,content:[...content],business:[...business],ai:[...ai],step,startingPlan,journeyDecision,advisorDecision}));
+  },[hydrated,website,pages,design,content,business,ai,step,startingPlan,journeyDecision,advisorDecision]);
 
   const toggle = (group:"content"|"business"|"ai", id:string) => {
     const current = group === "content" ? content : group === "business" ? business : ai;
@@ -158,6 +181,33 @@ export function Builder() {
 
   const chosen=[...content,...business,...ai];
   const labels:Record<string,string>={}; [...contentOptions,...businessOptions,...aiOptions].forEach(o=>labels[o[0]]=o[1]);
+  const getPlanChanges=(key:PlanKey)=>{
+    const preset=planPresets[key];
+    const presetIds=new Set([...preset.content,...preset.business,...preset.ai]);
+    const currentIds=new Set(chosen);
+    return {
+      added:chosen.filter(id=>!presetIds.has(id)).map(id=>labels[id]),
+      removed:[...presetIds].filter(id=>!currentIds.has(id)).map(id=>labels[id]),
+      changed:[pages!==preset.pages&&`Pages: ${preset.pages} → ${pages}`,design!==preset.design&&`Design: ${preset.design} → ${design}`,website!==preset.website&&`Type: ${preset.website} → ${website}`].filter(Boolean) as string[],
+    };
+  };
+  const nearestPlan=useMemo(()=>{
+    if(pages==="20+"||website==="Custom Digital Experience"||business.has("dashboard"))return {key:"signature" as PlanKey,score:0};
+    const currentIds=new Set(chosen);const pageIndex=pageOptions.indexOf(pages);const designIndex=designOptions.findIndex(option=>option.name===design);
+    return planKeys.map(key=>{
+      const preset=planPresets[key];const presetIds=new Set([...preset.content,...preset.business,...preset.ai]);
+      const featureDistance=[...currentIds].filter(id=>!presetIds.has(id)).length+[...presetIds].filter(id=>!currentIds.has(id)).length;
+      const score=Math.abs(pageIndex-pageOptions.indexOf(preset.pages))*2+Math.abs(designIndex-designOptions.findIndex(option=>option.name===preset.design))*2+featureDistance;
+      return {key,score};
+    }).sort((a,b)=>a.score-b.score)[0];
+  },[website,pages,design,content,business,ai]);
+  const nearestChanges=getPlanChanges(nearestPlan.key);
+  const startingChanges=startingPlan?getPlanChanges(startingPlan):null;
+  const fitActions=[
+    ...nearestChanges.changed.map(value=>{const [field,values]=value.split(": ");return `CHANGE · ${field} to ${values.split(" → ")[0]}`}),
+    ...nearestChanges.removed.map(value=>`ADD · ${value}`),
+    ...nearestChanges.added.map(value=>`REMOVE · ${value}`),
+  ];
 
   const chooseWebsite=(value:string)=>{
     const nextContent=new Set(content); const nextBusiness=new Set(business);
@@ -175,11 +225,13 @@ export function Builder() {
     websiteAuto.current={content:autoContent,business:autoBusiness};
     setWebsite(value);setContent(nextContent);setBusiness(nextBusiness);
   };
-  const submitConfig=()=>{
-    const detail={website,pages,design,features:chosen.map(x=>labels[x]),estimate,recommendation:recommendation.name};
+  const submitConfig=(decisionOverride?:string)=>{
+    const comparison=startingChanges||nearestChanges;
+    const detail={website,pages,design,features:chosen.map(x=>labels[x]),content:[...content].map(x=>labels[x]),business:[...business].map(x=>labels[x]),ai:[...ai].map(x=>labels[x]),estimate,recommendation:recommendation.name,nearestPackage:planPresets[nearestPlan.key].name,origin:startingPlan?"package":"custom",startedFrom:startingPlan?planPresets[startingPlan].name:null,journeyDecision:decisionOverride||journeyDecision,advisorDecision:advisorDecision||"not-chosen",added:comparison.added,removed:comparison.removed,changed:comparison.changed,fitActions,automaticLogic:dependencyNotes};
     window.sessionStorage.setItem("studioConfig", JSON.stringify(detail));
     window.location.assign("/contact");
   };
+  const useNearestPackage=()=>{applyPreset(nearestPlan.key);setJourneyDecision("matched-nearest-package");setAdvisorDecision(`matched-${nearestPlan.key}`);setQuotePulse(true);window.setTimeout(()=>setQuotePulse(false),260)};
   const goToStep=(nextStep:number)=>{
     setStep(nextStep);
     window.requestAnimationFrame(()=>document.querySelector(".builder-main")?.scrollIntoView({behavior:"smooth",block:"start"}));
@@ -187,6 +239,7 @@ export function Builder() {
   const resetBuilder=()=>{
     websiteAuto.current={content:new Set(),business:new Set()};
     setWebsite("Business Website");setPages("2–5");setDesign("Professional");setContent(new Set());setBusiness(new Set());setAi(new Set());setStep(1);
+    setStartingPlan(null);setShowPlanReview(false);setJourneyDecision("custom-build");setAdvisorDecision("");
     window.sessionStorage.removeItem("studioBuilderDraft");window.sessionStorage.removeItem("studioConfig");
   };
   const phases=["Website","Pages","Design","Content","Features","AI"];
@@ -197,6 +250,11 @@ export function Builder() {
     (ai.has("qualification")||ai.has("workflow"))&&"CRM is included so qualified leads have a destination.",
   ].filter(Boolean) as string[];
   const renderOptions=(items:OptionTuple[],group:"content"|"business"|"ai",set:Set<string>)=><div className="toggle-grid">{items.map(([id,label,note])=><button type="button" key={id} className={`toggle-option ${set.has(id)?"active":""}`} aria-pressed={set.has(id)} onClick={()=>toggle(group,id)}><span className="toggle-box" aria-hidden="true">{set.has(id)?"✓":""}</span><strong>{label}</strong><small>{note}</small>{((id==="cms"&&(content.has("blog")||business.has("ecommerce")))||(id==="payments"&&business.has("ecommerce"))||(id==="login"&&business.has("dashboard"))||(id==="crm"&&(ai.has("qualification")||ai.has("workflow"))))&&<em>AUTO-ADDED</em>}</button>)}</div>;
+
+  if(showPlanReview&&startingPlan){
+    const selected=planPresets[startingPlan];const included=[...selected.content,...selected.business,...selected.ai].map(id=>labels[id]);
+    return <section className="builder-section package-entry-section section-pad"><div className="builder-heading"><div className="section-kicker light"><span>YOUR CHOSEN STARTING POINT</span><i/></div><h2>Make {selected.name}<br/><em>work for you.</em></h2><p>Keep the package exactly as selected, or open it with every choice pre-filled and add or remove what you need.</p></div><div className="package-entry-card"><div className="package-entry-top"><div><small>SELECTED PACKAGE</small><h3>{selected.name}</h3><p>{selected.pages} pages · {selected.design}</p></div><strong><span>AED</span> {selected.price}</strong></div><div className="package-entry-scope"><div><small>PRE-FILLED SCOPE</small><ul><li>{selected.website}</li><li>{selected.pages} pages</li><li>{selected.design}</li>{included.map(item=><li key={item}>{item}</li>)}</ul></div><p>Nothing is locked. The final estimate is still calculated from the exact scope you choose, and individual item rates remain hidden.</p></div><div className="package-entry-actions"><button type="button" className="package-customise" onClick={()=>{setShowPlanReview(false);setJourneyDecision("customizing-package")}}>Customise this package <span>→</span></button><button type="button" className="package-continue" onClick={()=>submitConfig("package-as-selected")}>Continue with this package <span>↗</span></button><button type="button" className="package-scratch" onClick={()=>{setStartingPlan(null);setShowPlanReview(false);setJourneyDecision("custom-build");setAdvisorDecision("");setWebsite("Business Website");setPages("2–5");setDesign("Professional");setContent(new Set());setBusiness(new Set());setAi(new Set())}}>Build from scratch instead</button></div></div></section>;
+  }
 
   return <section className="builder-section section-pad" id="builder">
     <div className="builder-heading"><div className="section-kicker light"><span>YOUR SCOPE, PRICED LIVE</span><i /></div><h2>Build your website.</h2><p>Six focused decisions. One useful starting point.</p></div>
@@ -225,8 +283,9 @@ export function Builder() {
         <div className="quote-price"><small>Indicative project estimate</small><strong><span>AED</span> {formatAED(estimate)}</strong><p>No item prices are exposed. The total updates from the exact scope you choose.</p></div>
         <div className="quote-basics"><button type="button" onClick={()=>goToStep(1)}><span>Website</span><strong>{website}</strong><i>EDIT</i></button><button type="button" onClick={()=>goToStep(2)}><span>Pages</span><strong>{pages}</strong><i>EDIT</i></button><button type="button" onClick={()=>goToStep(3)}><span>Design</span><strong>{design}</strong><i>EDIT</i></button></div>
         <div className="quote-features"><span>INCLUDED IN THIS SCOPE <b>{chosen.length}</b></span><div>{chosen.length?chosen.slice(0,6).map(x=><small key={x}>{labels[x]}</small>):<p>Add content, business or AI features to refine the estimate.</p>}{chosen.length>6&&<small>+{chosen.length-6} more</small>}</div></div>
-        <div className="recommendation"><small>{recommendation.name==="CUSTOM CONFIGURATION"?"PRICING APPROACH":"CLOSEST STARTING POINT"}</small><span>{recommendation.name}</span><strong>{recommendation.custom?"SCOPE REVIEW":"MODULAR SCOPE"}</strong><em>Your choices set the price. The package name is a reference—not a minimum.</em></div>
-        <button type="button" className="quote-cta" onClick={submitConfig}><span>Get this website</span><span aria-hidden="true">↗</span></button>
+        {startingPlan&&startingChanges&&<div className="plan-origin"><small>STARTED FROM {planPresets[startingPlan].name}</small><p>{startingChanges.added.length+startingChanges.removed.length+startingChanges.changed.length===0?"No changes yet.":`${startingChanges.added.length} added · ${startingChanges.removed.length} removed · ${startingChanges.changed.length} changed`}</p></div>}
+        <div className="plan-advisor"><div className="plan-advisor-head"><small>SMART PLAN MATCH</small><b>{fitActions.length===0?"MATCHED":`${fitActions.length} CHANGES AWAY`}</b></div><div className="plan-advisor-name"><span>{planPresets[nearestPlan.key].name}</span><strong>NEAREST PACKAGE</strong></div>{fitActions.length>0?<><p>To match this package exactly:</p><ul>{fitActions.slice(0,4).map(action=><li key={action}>{action}</li>)}</ul><div className="plan-advisor-actions"><button type="button" onClick={useNearestPackage}>Use {planPresets[nearestPlan.key].name}</button><button type="button" className={advisorDecision==="kept-custom"?"selected":""} onClick={()=>{setAdvisorDecision("kept-custom");setJourneyDecision("kept-custom-scope")}}>{advisorDecision==="kept-custom"?"Keeping custom scope ✓":"Keep my scope"}</button></div></>:<p>This scope already matches the {planPresets[nearestPlan.key].name} setup. Your exact selections still determine the estimate.</p>}<em>Packages are useful reference bundles, never minimum-price floors.</em></div>
+        <button type="button" className="quote-cta" onClick={()=>submitConfig()}><span>Continue with this scope</span><span aria-hidden="true">↗</span></button>
         <button type="button" className="quote-reset" onClick={resetBuilder}>Start over</button>
         <p className="quote-foot">Indicative estimate · Final pricing follows a concise scope review · Third-party fees are separate</p>
       </aside>
