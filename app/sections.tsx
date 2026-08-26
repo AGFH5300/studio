@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const formatAED = (value: number) => new Intl.NumberFormat("en-AE").format(value);
 
@@ -255,10 +255,4 @@ const faqItems = [
 export function FAQ() {
   const [open,setOpen]=useState(0);
   return <section className="faq section-pad" id="faq"><div className="faq-intro"><div className="section-kicker"><span>USEFUL ANSWERS</span><i /></div><h2>Before you ask.</h2><p>Still have a question? Tell us what you are trying to build.</p><a href="/contact">Start a conversation ↗</a></div><div className="faq-list">{faqItems.map(([q,a],i)=><article key={q} className={open===i?"open":""}><button onClick={()=>setOpen(open===i?-1:i)} aria-expanded={open===i}><span>{String(i+1).padStart(2,"0")}</span><strong>{q}</strong><i>{open===i?"−":"+"}</i></button>{open===i&&<p>{a}</p>}</article>)}</div></section>;
-}
-
-export function Audit() {
-  const [open,setOpen]=useState(false); const [done,setDone]=useState(false); const [url,setUrl]=useState("");
-  const run=(e:FormEvent)=>{e.preventDefault();if(url.trim())setDone(true)};
-  return <section className="audit-section section-pad"><div className="audit-orb"><span>FREE</span><i>CHECK</i></div><div className="audit-copy"><small>PROTOTYPE TOOL</small><h2>How well is your website<br/><em>really working?</em></h2><p>A future quick check for performance, mobile experience, SEO, AEO, conversion basics and technical health.</p></div><button className="audit-button" onClick={()=>{setOpen(true);setDone(false)}}>Check my website <span>↗</span></button>{open&&<div className="audit-modal" role="dialog" aria-modal="true" aria-label="Website check demo"><button className="modal-close" onClick={()=>setOpen(false)} aria-label="Close">×</button>{!done?<><small>FREE WEBSITE CHECK · DEMO</small><h3>Start with your URL.</h3><p>This prototype shows how the audit experience could work. It does not scan the live website yet.</p><form onSubmit={run}><label>Website address<input required value={url} onChange={e=>setUrl(e.target.value)} placeholder="yourwebsite.ae" /></label><button>Show demo check <span>→</span></button></form></>:<><small>SIMULATED RESULT</small><h3>A useful first look.</h3><div className="audit-scores">{[["Performance","86"],["Mobile UX","74"],["SEO basics","81"],["AEO structure","62"]].map(([x,n])=><div key={x}><strong>{n}</strong><span>{x}</span></div>)}</div><p className="demo-note">Demo scores only—not a real scan. The production tool would analyse the submitted website before showing results.</p><button className="audit-reset" onClick={()=>setDone(false)}>Check another URL</button></>}</div>}</section>;
 }
