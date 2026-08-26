@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-export const metadata: Metadata = { title: "Process — STUDIO/AE", description: "A clear website process from discovery and design through build, launch and growth." };
+export const metadata: Metadata = { title: "Process — Veya Labs", description: "A clear website process from discovery and design through build, launch and growth." };
 
 const stages=[
   ["01","Discover","Define the goal before discussing layouts.","Goals, audience, required actions, content and useful references.","A clear brief and agreed scope."],
