@@ -44,7 +44,7 @@ export function SiteFooter() {
     <div className="footer-brand">STUDIO<span>/AE</span></div>
     <div className="footer-line">
       <p>Built in the UAE.<br/><em>Designed for anywhere.</em></p>
-      <div><a href="/services">Services</a><a href="/pricing">Pricing</a><a href="/build">Build your website</a><a href="/website-check">Website check</a></div>
+      <div><a href="/services">Services</a><a href="/pricing">Pricing</a><a href="/build">Build your website</a></div>
       <div><a href="/process">Process</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy + terms</a></div>
     </div>
     <div className="footer-bottom"><span>© 2026 STUDIO/AE</span><span>UAE WEB DESIGN + DIGITAL SYSTEMS</span></div>
