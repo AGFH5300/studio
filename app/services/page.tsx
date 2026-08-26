@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Services — STUDIO/AE", description: "Web design, development, ecommerce, search, AI and practical integrations for UAE businesses." };
+export const metadata: Metadata = { title: "Services — Veya Labs", description: "Web design, development, ecommerce, search, AI and practical integrations for UAE businesses." };
 
 const services=[
   ["01","design","Web design","Give the business a visual system people remember—and an interface they understand immediately.","Attention → understanding → action",["Art direction","UX / UI","Responsive systems","Conversion journeys"]],
