@@ -26,11 +26,11 @@ export function SiteHeader() {
   }, []);
 
   useEffect(()=>{const frame=requestAnimationFrame(()=>setDark(document.documentElement.dataset.theme==="dark"));return()=>cancelAnimationFrame(frame)},[]);
-  const toggleTheme=()=>{const next=!dark;setDark(next);document.documentElement.dataset.theme=next?"dark":"light";localStorage.setItem("studio-theme",next?"dark":"light")};
+  const toggleTheme=()=>{const next=!dark;setDark(next);document.documentElement.dataset.theme=next?"dark":"light";localStorage.setItem("veya-theme",next?"dark":"light")};
 
   const darkTop = ["/build","/contact"].includes(pathname);
   return <header className={`site-header ${scrolled ? "scrolled" : ""} ${darkTop ? "over-dark" : ""}`}>
-    <Link className="brand" href="/" aria-label="STUDIO AE home">STUDIO<span>/AE</span></Link>
+    <Link className="brand" href="/" aria-label="Veya Labs home">Veya<span> Labs</span></Link>
     <nav className={open ? "open" : ""} aria-label="Primary navigation">
       {navItems.map(([label, href]) => <a className={pathname===href?"active":""} key={href} href={href} onClick={() => setOpen(false)}>{label}</a>)}
     </nav>
@@ -41,12 +41,12 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return <footer>
-    <div className="footer-brand">STUDIO<span>/AE</span></div>
+    <div className="footer-brand">Veya<span> Labs</span></div>
     <div className="footer-line">
       <p>Built in the UAE.<br/><em>Designed for anywhere.</em></p>
       <div><a href="/services">Services</a><a href="/pricing">Pricing</a><a href="/build">Build your website</a></div>
       <div><a href="/process">Process</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy + terms</a></div>
     </div>
-    <div className="footer-bottom"><span>© 2026 STUDIO/AE</span><span>UAE WEB DESIGN + DIGITAL SYSTEMS</span></div>
+    <div className="footer-bottom"><span>© 2026 Veya Labs</span><span>UAE WEB DESIGN + DIGITAL SYSTEMS</span></div>
   </footer>;
 }
