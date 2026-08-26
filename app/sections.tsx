@@ -80,7 +80,7 @@ const designOptions = [
   {name:"Signature Art Direction",note:"A distinctive visual system and high-touch interactive direction.",icon:"signature" as IconName,tone:"gold" as Tone},
 ];
 const contentOptions = [
-  ["cms","CMS","Update key pages, images and content without touching code.","cms","blue"],["blog","Blog / News","Publish articles, company news and SEO-focused updates.","blog","coral"],["portfolio","Portfolio / Projects","Add and organise projects in a consistent case-study format.","projects","violet"],["team","Team section","Manage staff profiles, roles, biographies and profile images.","team","cyan"],["testimonials","Testimonials","Add and update client quotes or reviews as trust grows.","testimonials","pink"],["faq","FAQ management","Keep common customer questions and answers accurate and current.","faq","gold"],["copywriting","Copywriting","Professional page copy shaped around clarity and conversion.","copywriting","indigo"],["arabic","Arabic / RTL","Arabic content with right-to-left layouts designed and tested properly.","arabic","green"],["languages","Additional language","A translated site structure with a clear language switcher.","languages","lime"],
+  ["cms","CMS","Update key pages, images and content without touching code.","cms","blue"],["blog","Blog / News","Publish articles, company news and SEO-focused updates.","blog","coral"],["portfolio","Portfolio / Projects","Add and organise projects in a consistent case-study format.","projects","violet"],["team","Team section","Manage staff profiles, roles, biographies and profile images.","team","cyan"],["testimonials","Testimonials","Add and update client quotes or reviews as trust grows.","testimonials","pink"],["faq","FAQ management","Keep common customer questions and answers accurate and current.","faq","gold"],["copywriting","Copywriting","Professional page copy shaped around clarity and conversion.","copywriting","indigo"],["arabic","Arabic / RTL","Arabic content with right-to-left layouts designed and tested properly.","arabic","green"],["languages","Every language","A multilingual structure covering every language your website requires.","languages","lime"],
 ] as OptionTuple[];
 const businessOptions = [
   ["whatsapp","WhatsApp","A clear click-to-chat action that opens a customer conversation.","whatsapp","green"],["form","Advanced contact form","Detailed or conditional forms that collect the right enquiry information.","form","blue"],["newsletter","Newsletter","Connect sign-ups to your chosen email marketing platform.","newsletter","coral"],["booking","Booking","Let customers choose available times and schedule online.","calendar","pink"],["payments","Online payments","Accept secure online payments through one standard payment gateway.","payments","gold"],["ecommerce","Ecommerce","A starter online store with products, cart and checkout.","store","violet"],["login","Customer login","Give approved customers a secure sign-in area.","login","indigo"],["dashboard","Customer dashboard","A personalised account area for customer information or actions.","dashboard","cyan"],["search","Search","Help visitors quickly find pages, articles or products.","search","blue"],["filters","Advanced filters","Let visitors narrow larger catalogues by useful attributes.","filters","lime"],["uploads","File uploads","Allow customers to securely attach documents or images to forms.","uploads","coral"],["careers","Careers / jobs","Publish structured vacancies and collect job applications.","careers","pink"],["crm","CRM integration","Send leads and enquiry details into your sales pipeline.","crm","green"],
@@ -113,15 +113,19 @@ export function Builder() {
   const [hydrated,setHydrated] = useState(false);
   const [startingPlan,setStartingPlan] = useState<PlanKey|null>(null);
   const [showPlanReview,setShowPlanReview] = useState(false);
+  const [reviewing,setReviewing] = useState(false);
   const [journeyDecision,setJourneyDecision] = useState("custom-build");
   const [advisorDecision,setAdvisorDecision] = useState("");
   const websiteAuto = useRef<{content:Set<string>;business:Set<string>}>({content:new Set(),business:new Set()});
+  const languageAutoArabic = useRef(false);
 
   const applyPreset=(key:PlanKey)=>{
     const preset=planPresets[key];
     websiteAuto.current={content:new Set(),business:new Set()};
+    languageAutoArabic.current=preset.content.includes("languages")&&!preset.content.includes("arabic");
+    const presetContent=new Set(preset.content);if(presetContent.has("languages"))presetContent.add("arabic");
     setWebsite(preset.website);setPages(preset.pages);setDesign(preset.design);
-    setContent(new Set(preset.content));setBusiness(new Set(preset.business));setAi(new Set(preset.ai));
+    setContent(presetContent);setBusiness(new Set(preset.business));setAi(new Set(preset.ai));
   };
 
   useEffect(() => {
@@ -138,13 +142,14 @@ export function Builder() {
             if(websiteTypes.includes(draft.website))setWebsite(draft.website);
             if(pageOptions.includes(draft.pages))setPages(draft.pages);
             if(designOptions.some(option=>option.name===draft.design))setDesign(draft.design);
-            if(Array.isArray(draft.content))setContent(new Set(draft.content));
+            if(Array.isArray(draft.content)){const restoredContent=new Set<string>(draft.content);const hadArabic=restoredContent.has("arabic");if(restoredContent.has("languages"))restoredContent.add("arabic");if(typeof draft.languageAutoArabic!=="boolean")languageAutoArabic.current=restoredContent.has("languages")&&!hadArabic;setContent(restoredContent)}
             if(Array.isArray(draft.business))setBusiness(new Set(draft.business));
             if(Array.isArray(draft.ai))setAi(new Set(draft.ai));
             if(Number.isInteger(draft.step))setStep(Math.min(6,Math.max(1,draft.step)));
             if(planKeys.includes(draft.startingPlan))setStartingPlan(draft.startingPlan);
             if(typeof draft.journeyDecision==="string")setJourneyDecision(draft.journeyDecision);
             if(typeof draft.advisorDecision==="string")setAdvisorDecision(draft.advisorDecision);
+            if(typeof draft.languageAutoArabic==="boolean")languageAutoArabic.current=draft.languageAutoArabic;
           }
         } catch {}
       }
@@ -155,7 +160,7 @@ export function Builder() {
 
   useEffect(()=>{
     if(!hydrated)return;
-    window.sessionStorage.setItem("studioBuilderDraft",JSON.stringify({website,pages,design,content:[...content],business:[...business],ai:[...ai],step,startingPlan,journeyDecision,advisorDecision}));
+    window.sessionStorage.setItem("studioBuilderDraft",JSON.stringify({website,pages,design,content:[...content],business:[...business],ai:[...ai],step,startingPlan,journeyDecision,advisorDecision,languageAutoArabic:languageAutoArabic.current}));
   },[hydrated,website,pages,design,content,business,ai,step,startingPlan,journeyDecision,advisorDecision]);
 
   const toggle = (group:"content"|"business"|"ai", id:string) => {
@@ -165,6 +170,19 @@ export function Builder() {
     if(next.has(id)) next.delete(id); else next.add(id);
     if(group === "content" && id === "blog" && next.has("blog")) next.add("cms");
     if(group === "content" && id === "cms" && !next.has("cms") && (next.has("blog") || business.has("ecommerce"))) return;
+    if(group === "content" && id === "languages") {
+      if(next.has("languages")){
+        languageAutoArabic.current=!next.has("arabic");
+        next.add("arabic");
+      } else {
+        if(languageAutoArabic.current)next.delete("arabic");
+        languageAutoArabic.current=false;
+      }
+    }
+    if(group === "content" && id === "arabic") {
+      if(!next.has("arabic")&&next.has("languages"))return;
+      languageAutoArabic.current=false;
+    }
     if(group === "business" && id === "ecommerce") {
       if(next.has("ecommerce")){ setContent(prev => new Set(prev).add("cms")); next.add("payments"); }
     }
@@ -197,7 +215,7 @@ export function Builder() {
     const typeCosts:Record<string,number>={"Landing Page":0,"Business Website":0,"Portfolio":150,"Professional Services":250,"Restaurant / Hospitality":350,"Ecommerce":900,"Booking Website":350,"Corporate Website":1200,"Custom Digital Experience":3000};
     const pageCosts:Record<string,number>={"1":0,"2–5":0,"6–8":450,"9–12":1000,"13–20":1900,"20+":3000};
     const designCosts:Record<string,number>={"Professional":0,"Premium":499,"Advanced Motion":899,"Signature Art Direction":1499};
-    const contentCosts:Record<string,number>={cms:349,blog:199,portfolio:149,team:99,testimonials:99,faq:99,copywriting:0,arabic:799,languages:599};
+    const contentCosts:Record<string,number>={cms:349,blog:199,portfolio:149,team:99,testimonials:99,faq:99,copywriting:0,arabic:799,languages:1499};
     const businessCosts:Record<string,number>={whatsapp:0,form:199,newsletter:149,booking:399,payments:299,ecommerce:1499,login:699,dashboard:1499,search:249,filters:399,uploads:299,careers:149,crm:499};
     const aiCosts:Record<string,number>={assistant:699,qualification:999,summaries:399,knowledge:999,workflow:1499};
     const pageCounts:Record<string,number>={"1":1,"2–5":4,"6–8":7,"9–12":10,"13–20":16,"20+":24};
@@ -206,6 +224,7 @@ export function Builder() {
     content.forEach(id => {
       if(id==="copywriting") raw+=pageCounts[pages]*99;
       else if(id==="cms"&&business.has("ecommerce")) return;
+      else if(id==="arabic"&&content.has("languages")) return;
       else raw+=contentCosts[id]||0;
     });
     business.forEach(id => {
@@ -266,19 +285,24 @@ export function Builder() {
   };
   const submitConfig=(decisionOverride?:string)=>{
     const comparison=startingChanges||nearestChanges;
-    const detail={website,pages,design,features:chosen.map(x=>labels[x]),content:[...content].map(x=>labels[x]),business:[...business].map(x=>labels[x]),ai:[...ai].map(x=>labels[x]),estimate,recommendation:recommendation.name,nearestPackage:planPresets[nearestPlan.key].name,origin:startingPlan?"package":"custom",startedFrom:startingPlan?planPresets[startingPlan].name:null,journeyDecision:decisionOverride||journeyDecision,advisorDecision:advisorDecision||"not-chosen",added:comparison.added,removed:comparison.removed,changed:comparison.changed,fitActions,automaticLogic:dependencyNotes};
+    const detail={website,pages,design,features:chosen.map(x=>labels[x]),content:[...content].map(x=>labels[x]),business:[...business].map(x=>labels[x]),ai:[...ai].map(x=>labels[x]),estimate,recommendation:recommendation.name,nearestPackage:planPresets[nearestPlan.key].name,nearestPackagePrice:planPresets[nearestPlan.key].price,origin:startingPlan?"package":"custom",startedFrom:startingPlan?planPresets[startingPlan].name:null,journeyDecision:decisionOverride||journeyDecision,advisorDecision:advisorDecision||"not-chosen",added:comparison.added,removed:comparison.removed,changed:comparison.changed,fitActions,automaticLogic:dependencyNotes};
     window.sessionStorage.setItem("studioConfig", JSON.stringify(detail));
     window.location.assign("/contact");
   };
   const useNearestPackage=()=>{applyPreset(nearestPlan.key);setJourneyDecision("matched-nearest-package");setAdvisorDecision(`matched-${nearestPlan.key}`);setQuotePulse(true);window.setTimeout(()=>setQuotePulse(false),260)};
   const goToStep=(nextStep:number)=>{
+    setReviewing(false);
     setStep(nextStep);
     window.requestAnimationFrame(()=>document.querySelector(".builder-main")?.scrollIntoView({behavior:"smooth",block:"start"}));
   };
+  const showEstimateReview=()=>{
+    setReviewing(true);setJourneyDecision("reviewing-estimate");
+    window.requestAnimationFrame(()=>document.querySelector(".builder-main")?.scrollIntoView({behavior:"smooth",block:"start"}));
+  };
   const resetBuilder=()=>{
-    websiteAuto.current={content:new Set(),business:new Set()};
+    websiteAuto.current={content:new Set(),business:new Set()};languageAutoArabic.current=false;
     setWebsite("Business Website");setPages("2–5");setDesign("Professional");setContent(new Set());setBusiness(new Set());setAi(new Set());setStep(1);
-    setStartingPlan(null);setShowPlanReview(false);setJourneyDecision("custom-build");setAdvisorDecision("");
+    setStartingPlan(null);setShowPlanReview(false);setReviewing(false);setJourneyDecision("custom-build");setAdvisorDecision("");
     window.sessionStorage.removeItem("studioBuilderDraft");window.sessionStorage.removeItem("studioConfig");
   };
   const phases=["Website","Pages","Design","Content","Features","AI"];
@@ -286,25 +310,38 @@ export function Builder() {
     content.has("blog")&&"CMS is included because Blog / News needs editable content.",
     business.has("ecommerce")&&"CMS and online payments are included with Ecommerce.",
     business.has("dashboard")&&"Customer login is included with a Customer dashboard.",
+    content.has("languages")&&"Arabic / RTL is included because Every language covers right-to-left layouts too.",
     (ai.has("qualification")||ai.has("workflow"))&&"CRM is included so qualified leads have a destination.",
   ].filter(Boolean) as string[];
-  const renderOptions=(items:OptionTuple[],group:"content"|"business"|"ai",set:Set<string>)=><div className="toggle-grid">{items.map(([id,label,note,icon,tone])=><button type="button" key={id} className={`toggle-option ${set.has(id)?"active":""}`} aria-pressed={set.has(id)} onClick={()=>toggle(group,id)}><span className={`estimator-icon tone-${tone}`}><EstimatorIcon name={icon}/></span><span className="toggle-copy"><strong>{label}</strong><small>{note}</small></span><span className="toggle-box" aria-hidden="true">{set.has(id)?"✓":""}</span>{((id==="cms"&&(content.has("blog")||business.has("ecommerce")))||(id==="payments"&&business.has("ecommerce"))||(id==="login"&&business.has("dashboard"))||(id==="crm"&&(ai.has("qualification")||ai.has("workflow"))))&&<em>AUTO-ADDED</em>}</button>)}</div>;
+  const isAutoAdded=(id:string)=>(id==="cms"&&(content.has("blog")||business.has("ecommerce")))||(id==="payments"&&business.has("ecommerce"))||(id==="login"&&business.has("dashboard"))||(id==="arabic"&&content.has("languages"))||(id==="crm"&&(ai.has("qualification")||ai.has("workflow")));
+  const renderOptions=(items:OptionTuple[],group:"content"|"business"|"ai",set:Set<string>)=><div className="toggle-grid">{items.map(([id,label,note,icon,tone])=><button type="button" key={id} className={`toggle-option ${set.has(id)?"active":""}`} aria-pressed={set.has(id)} onClick={()=>toggle(group,id)}><span className={`estimator-icon tone-${tone}`}><EstimatorIcon name={icon}/></span><span className="toggle-copy"><strong>{label}</strong><small>{note}</small></span><span className="toggle-box" aria-hidden="true">{set.has(id)?"✓":""}</span>{isAutoAdded(id)&&<em>AUTO-ADDED</em>}</button>)}</div>;
+  const renderReviewGroup=(number:string,title:string,items:OptionTuple[],selected:Set<string>,editStep:number)=>{
+    const selectedItems=items.filter(([id])=>selected.has(id));
+    return <article className="review-group"><header><span>{number}</span><h4>{title}</h4><button type="button" onClick={()=>goToStep(editStep)}>Edit</button></header><div className="review-items">{selectedItems.length?selectedItems.map(([id,label,,icon,tone])=><div key={id}><span className={`estimator-icon tone-${tone}`}><EstimatorIcon name={icon}/></span><p><strong>{label}</strong><small>{isAutoAdded(id)?"Included automatically":"Selected"}</small></p></div>):<p className="review-empty">No optional modules selected.</p>}</div></article>;
+  };
 
   if(showPlanReview&&startingPlan){
     const selected=planPresets[startingPlan];const included=[...selected.content,...selected.business,...selected.ai].map(id=>labels[id]);
-    return <section className="builder-section package-entry-section section-pad"><div className="builder-heading"><div className="section-kicker light"><span>YOUR CHOSEN STARTING POINT</span><i/></div><h2>Make {selected.name}<br/><em>work for you.</em></h2><p>Keep the package exactly as selected, or open it with every choice pre-filled and add or remove what you need.</p></div><div className="package-entry-card"><div className="package-entry-top"><div><small>SELECTED PACKAGE</small><h3>{selected.name}</h3><p>{selected.pages} pages · {selected.design}</p></div><strong><span>AED</span> {selected.price}</strong></div><div className="package-entry-scope"><div><small>PRE-FILLED SCOPE</small><ul><li>{selected.website}</li><li>{selected.pages} pages</li><li>{selected.design}</li>{included.map(item=><li key={item}>{item}</li>)}</ul></div><p>Nothing is locked. The final estimate is still calculated from the exact scope you choose, and individual item rates remain hidden.</p></div><div className="package-entry-actions"><button type="button" className="package-customise" onClick={()=>{setShowPlanReview(false);setJourneyDecision("customizing-package")}}>Customise this package <span>→</span></button><button type="button" className="package-continue" onClick={()=>submitConfig("package-as-selected")}>Continue with this package <span>↗</span></button><button type="button" className="package-scratch" onClick={()=>{setStartingPlan(null);setShowPlanReview(false);setJourneyDecision("custom-build");setAdvisorDecision("");setWebsite("Business Website");setPages("2–5");setDesign("Professional");setContent(new Set());setBusiness(new Set());setAi(new Set())}}>Build from scratch instead</button></div></div></section>;
+    return <section className="builder-section package-entry-section section-pad"><div className="builder-heading"><div className="section-kicker light"><span>YOUR CHOSEN STARTING POINT</span><i/></div><h2>Make {selected.name}<br/><em>work for you.</em></h2><p>Keep the package exactly as selected, or open it with every choice pre-filled and add or remove what you need.</p></div><div className="package-entry-card"><div className="package-entry-top"><div><small>SELECTED PACKAGE</small><h3>{selected.name}</h3><p>{selected.pages} pages · {selected.design}</p></div><strong><span>AED</span> {selected.price}</strong></div><div className="package-entry-scope"><div><small>PRE-FILLED SCOPE</small><ul><li>{selected.website}</li><li>{selected.pages} pages</li><li>{selected.design}</li>{included.map(item=><li key={item}>{item}</li>)}</ul></div><p>Nothing is locked. The final estimate is still calculated from the exact scope you choose, and individual item rates remain hidden.</p></div><div className="package-entry-actions"><button type="button" className="package-customise" onClick={()=>{setShowPlanReview(false);setJourneyDecision("customizing-package")}}>Customise this package <span>→</span></button><button type="button" className="package-continue" onClick={()=>submitConfig("package-as-selected")}>Continue with this package <span>↗</span></button><button type="button" className="package-scratch" onClick={()=>{languageAutoArabic.current=false;setStartingPlan(null);setShowPlanReview(false);setReviewing(false);setJourneyDecision("custom-build");setAdvisorDecision("");setWebsite("Business Website");setPages("2–5");setDesign("Professional");setContent(new Set());setBusiness(new Set());setAi(new Set())}}>Build from scratch instead</button></div></div></section>;
   }
 
   return <section className="builder-section section-pad" id="builder">
     <div className="builder-heading"><div className="section-kicker light"><span>YOUR SCOPE, PRICED LIVE</span><i /></div><h2>Build your website.</h2><p>Six focused decisions. One useful starting point.</p></div>
-    <div className="builder-shell">
+    <div className={`builder-shell ${reviewing?"review-mode":""}`}>
       <div className="builder-main">
         <div className="builder-progress-wrap">
-          <div className="builder-progress-meta"><span>PROJECT ESTIMATOR</span><b>{step} of 6</b><small>About 2 minutes</small></div>
-          <div className="builder-progress" aria-label="Estimator progress">{phases.map((x,i)=><button type="button" key={x} className={`${step===i+1?"active":""} ${step>i+1?"done":""}`} aria-label={`${x}, step ${i+1} of 6`} aria-current={step===i+1?"step":undefined} onClick={()=>goToStep(i+1)}><span>{step>i+1?"✓":i+1}</span><strong>{x}</strong></button>)}</div>
-          <div className="progress-line" aria-hidden="true"><i style={{width:`${((step-1)/5)*100}%`}}/></div>
+          <div className="builder-progress-meta"><span>PROJECT ESTIMATOR</span><b>{reviewing?"Review ready":`${step} of 6`}</b><small>{reviewing?"Check before sending":"About 2 minutes"}</small></div>
+          <div className="builder-progress" aria-label="Estimator progress">{phases.map((x,i)=><button type="button" key={x} className={`${!reviewing&&step===i+1?"active":""} ${(reviewing||step>i+1)?"done":""}`} aria-label={`${x}, step ${i+1} of 6`} aria-current={!reviewing&&step===i+1?"step":undefined} onClick={()=>goToStep(i+1)}><span>{(reviewing||step>i+1)?"✓":i+1}</span><strong>{x}</strong></button>)}</div>
+          <div className="progress-line" aria-hidden="true"><i style={{width:reviewing?"100%":`${((step-1)/5)*100}%`}}/></div>
         </div>
         <div className="builder-panel">
+          {reviewing?<div className="estimate-review">
+            <header className="estimate-review-head"><div><small>YOUR WEBSITE BRIEF</small><h3>Review your estimate.</h3><p>Check the complete scope before sending it to Veya Labs. You can edit any section without losing your selections.</p></div><div className="review-total"><small>INDICATIVE PROJECT ESTIMATE</small><strong><span>AED</span> {formatAED(estimate)}</strong><p>The final proposal follows a concise scope review. Individual item rates remain private.</p></div></header>
+            <div className="review-foundation"><header><span>01</span><h4>Project foundation</h4><button type="button" onClick={()=>goToStep(1)}>Edit</button></header><dl><div><dt>Website</dt><dd>{website}</dd></div><div><dt>Pages</dt><dd>{pages}</dd></div><div><dt>Design</dt><dd>{design}</dd></div></dl></div>
+            <div className="review-groups">{renderReviewGroup("02","Content & languages",contentOptions,content,4)}{renderReviewGroup("03","Business features",businessOptions,business,5)}{renderReviewGroup("04","AI & automation",aiOptions,ai,6)}</div>
+            <div className="review-bottom"><section className="review-logic"><small>AUTOMATIC LOGIC</small><h4>Dependencies handled for you.</h4>{dependencyNotes.length?<ul>{dependencyNotes.map(note=><li key={note}><span>✓</span>{note}</li>)}</ul>:<p>No additional dependencies were needed for this scope.</p>}</section><aside className="review-match"><div className="review-match-label"><small>SMART PLAN MATCH</small><b>{fitActions.length===0?"MATCHED":`${fitActions.length} CHANGES AWAY`}</b></div><div className="review-match-title"><h4>{planPresets[nearestPlan.key].name}</h4><strong><span>AED</span> {planPresets[nearestPlan.key].price}</strong></div><p>Your configuration is priced from its exact selections. The package is shown only as the nearest ready-made reference.</p>{fitActions.length>0&&<><ul>{fitActions.slice(0,4).map(action=><li key={action}>{action}</li>)}</ul><button type="button" onClick={useNearestPackage}>Use {planPresets[nearestPlan.key].name} instead</button></>}</aside></div>
+            <footer className="review-actions"><div><small>WHAT HAPPENS NEXT</small><p>Your full scope, estimate and package comparison will be attached to the enquiry form for the Veya Labs team.</p></div><button type="button" className="review-edit" onClick={()=>goToStep(6)}>Edit selections</button><button type="button" className="review-continue" onClick={()=>submitConfig("reviewed-estimate")}>Continue to contact <span>↗</span></button></footer>
+          </div>:<>
           <div className="step-content" key={step}>
             {step===1&&<><div className="step-title"><small>FIRST, THE FORMAT</small><h3>What are we building?</h3><p>Choose the closest fit. This shapes the questions that follow—it does not lock you into a package.</p></div><div className="choice-grid website-types">{websiteTypes.map((x,i)=><button type="button" key={x} className={website===x?"selected":""} aria-pressed={website===x} onClick={()=>chooseWebsite(x)}><span className="choice-number">0{i+1}</span><span className={`estimator-icon tone-${websiteMeta[i].tone}`}><EstimatorIcon name={websiteMeta[i].icon}/></span><span className="website-choice-copy"><strong>{x}</strong><small>{websiteMeta[i].note}</small></span><b>{website===x?"Selected":"Choose"} <i>{website===x?"✓":"↗"}</i></b></button>)}</div></>}
             {step===2&&<><div className="step-title"><small>NOW, THE SCALE</small><h3>How many core pages?</h3><p>Count unique layouts such as Home, About, Services and Contact—not every article or product.</p></div><div className="choice-grid page-choices">{pageOptions.map((x,i)=><button type="button" key={x} className={pages===x?"selected":""} aria-pressed={pages===x} onClick={()=>setPages(x)}><span className="choice-number">0{i+1}</span><span className={`estimator-icon tone-${(["blue","cyan","green","gold","coral","violet"] as Tone[])[i]}`}><EstimatorIcon name="pages"/></span><b>{x}</b><span>{pageNotes[i]}</span><i>{pages===x?"✓":""}</i></button>)}</div></>}
@@ -314,7 +351,8 @@ export function Builder() {
             {step===6&&<><div className="step-title"><small>AI &amp; AUTOMATION</small><h3>Where would intelligence help?</h3><p>Choose practical modules, not AI for show. Third-party subscriptions and usage remain separate.</p></div>{renderOptions(aiOptions,"ai",ai)}<div className="automation-demo"><small>ONE POSSIBLE FLOW</small><div><span>Enquiry</span><i>→</i><span>AI qualification</span><i>→</i><span>CRM</span><i>→</i><span>Sales follow-up</span></div></div></>}
           </div>
           {dependencyNotes.length>0&&step>=4&&<div className="dependency-note" aria-live="polite"><span>AUTOMATIC LOGIC</span><p>{dependencyNotes[dependencyNotes.length-1]}</p><i>✓</i></div>}
-          <div className="builder-nav"><button onClick={()=>goToStep(Math.max(1,step-1))} disabled={step===1}>← Back</button>{step<6?<button className="next" onClick={()=>goToStep(step+1)}>Continue <span>→</span></button>:<button className="next" onClick={()=>document.querySelector(".live-quote")?.scrollIntoView({behavior:"smooth",block:"center"})}>Review estimate <span>↗</span></button>}</div>
+          <div className="builder-nav"><button onClick={()=>goToStep(Math.max(1,step-1))} disabled={step===1}>← Back</button>{step<6?<button className="next" onClick={()=>goToStep(step+1)}>Continue <span>→</span></button>:<button className="next" onClick={showEstimateReview}>Review estimate <span>↗</span></button>}</div>
+          </>}
         </div>
       </div>
       <aside className={`live-quote ${quotePulse?"pulse":""}`}>
@@ -323,8 +361,8 @@ export function Builder() {
         <div className="quote-basics"><button type="button" onClick={()=>goToStep(1)}><span>Website</span><strong>{website}</strong><i>EDIT</i></button><button type="button" onClick={()=>goToStep(2)}><span>Pages</span><strong>{pages}</strong><i>EDIT</i></button><button type="button" onClick={()=>goToStep(3)}><span>Design</span><strong>{design}</strong><i>EDIT</i></button></div>
         <div className="quote-features"><span>INCLUDED IN THIS SCOPE <b>{chosen.length}</b></span><div>{chosen.length?chosen.slice(0,6).map(x=><small key={x}>{labels[x]}</small>):<p>Add content, business or AI features to refine the estimate.</p>}{chosen.length>6&&<small>+{chosen.length-6} more</small>}</div></div>
         {startingPlan&&startingChanges&&<div className="plan-origin"><small>STARTED FROM {planPresets[startingPlan].name}</small><p>{startingChanges.added.length+startingChanges.removed.length+startingChanges.changed.length===0?"No changes yet.":`${startingChanges.added.length} added · ${startingChanges.removed.length} removed · ${startingChanges.changed.length} changed`}</p></div>}
-        <div className="plan-advisor"><div className="plan-advisor-head"><small>SMART PLAN MATCH</small><b>{fitActions.length===0?"MATCHED":`${fitActions.length} CHANGES AWAY`}</b></div><div className="plan-advisor-name"><span>{planPresets[nearestPlan.key].name}</span><strong>NEAREST PACKAGE</strong></div>{fitActions.length>0?<><p>To match this package exactly:</p><ul>{fitActions.slice(0,4).map(action=><li key={action}>{action}</li>)}</ul><div className="plan-advisor-actions"><button type="button" onClick={useNearestPackage}>Use {planPresets[nearestPlan.key].name}</button><button type="button" className={advisorDecision==="kept-custom"?"selected":""} onClick={()=>{setAdvisorDecision("kept-custom");setJourneyDecision("kept-custom-scope")}}>{advisorDecision==="kept-custom"?"Keeping custom scope ✓":"Keep my scope"}</button></div></>:<p>This scope already matches the {planPresets[nearestPlan.key].name} setup. Your exact selections still determine the estimate.</p>}<em>Packages are useful reference bundles, never minimum-price floors.</em></div>
-        <button type="button" className="quote-cta" onClick={()=>submitConfig()}><span>Continue with this scope</span><span aria-hidden="true">↗</span></button>
+        <div className="plan-advisor"><div className="plan-advisor-head"><small>SMART PLAN MATCH</small><b>{fitActions.length===0?"MATCHED":`${fitActions.length} CHANGES AWAY`}</b></div><div className="plan-advisor-name"><div><span>{planPresets[nearestPlan.key].name}</span><strong>NEAREST PACKAGE</strong></div><b><small>AED</small> {planPresets[nearestPlan.key].price}</b></div>{fitActions.length>0?<><p>To match this package exactly:</p><ul>{fitActions.slice(0,4).map(action=><li key={action}>{action}</li>)}</ul><div className="plan-advisor-actions"><button type="button" onClick={useNearestPackage}>Use {planPresets[nearestPlan.key].name}</button><button type="button" className={advisorDecision==="kept-custom"?"selected":""} onClick={()=>{setAdvisorDecision("kept-custom");setJourneyDecision("kept-custom-scope")}}>{advisorDecision==="kept-custom"?"Keeping custom scope ✓":"Keep my scope"}</button></div></>:<p>This scope already matches the {planPresets[nearestPlan.key].name} setup. Your exact selections still determine the estimate.</p>}<em>Packages are useful reference bundles, never minimum-price floors.</em></div>
+        <button type="button" className="quote-cta" onClick={showEstimateReview}><span>Review complete estimate</span><span aria-hidden="true">↗</span></button>
         <button type="button" className="quote-reset" onClick={resetBuilder}>Start over</button>
         <p className="quote-foot">Indicative estimate · Final pricing follows a concise scope review · Third-party fees are separate</p>
       </aside>
