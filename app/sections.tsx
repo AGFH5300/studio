@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import {
+  AppWindow, Article, Books, Briefcase, Browser, Building, Buildings, CalendarCheck, CreditCard,
+  CursorClick, Diamond, EnvelopeSimpleOpen, Files, FlowArrow, FolderOpen,
+  ForkKnife, IdentificationCard, Kanban, Layout, ListChecks,
+  MagnifyingGlass, NotePencil, FileText, Images, PenNib, PencilLine, Question,
+  Quotes, Robot, SignIn, SlidersHorizontal, SquaresFour, Storefront,
+  TextAlignRight, Translate, UploadSimple, UserCheck, UsersThree, WhatsappLogo,
+} from "@phosphor-icons/react";
 
 const formatAED = (value: number) => new Intl.NumberFormat("en-AE").format(value);
 
@@ -32,51 +39,24 @@ export function Pricing() {
   </section>;
 }
 
-type IconName = "landing"|"business"|"portfolio"|"services"|"restaurant"|"store"|"calendar"|"corporate"|"custom"|"pages"|"professional"|"premium"|"motion"|"signature"|"cms"|"blog"|"team"|"testimonials"|"faq"|"copywriting"|"arabic"|"languages"|"whatsapp"|"form"|"newsletter"|"payments"|"login"|"dashboard"|"search"|"filters"|"uploads"|"careers"|"crm"|"assistant"|"qualification"|"summaries"|"knowledge"|"workflow";
 type Tone = "blue"|"violet"|"coral"|"green"|"gold"|"cyan"|"pink"|"indigo"|"lime";
 
+const estimatorIcons = {
+  landing:Browser,business:Buildings,portfolio:FolderOpen,projects:Images,services:IdentificationCard,
+  restaurant:ForkKnife,store:Storefront,calendar:CalendarCheck,corporate:Building,
+  custom:AppWindow,pages:Files,professional:Layout,premium:Diamond,motion:CursorClick,
+  signature:PenNib,cms:NotePencil,blog:Article,team:UsersThree,testimonials:Quotes,
+  faq:Question,copywriting:PencilLine,arabic:TextAlignRight,languages:Translate,
+  whatsapp:WhatsappLogo,form:ListChecks,newsletter:EnvelopeSimpleOpen,payments:CreditCard,
+  login:SignIn,dashboard:SquaresFour,search:MagnifyingGlass,filters:SlidersHorizontal,
+  uploads:UploadSimple,careers:Briefcase,crm:Kanban,assistant:Robot,
+  qualification:UserCheck,summaries:FileText,knowledge:Books,workflow:FlowArrow,
+} as const;
+type IconName = keyof typeof estimatorIcons;
+
 function EstimatorIcon({name}:{name:IconName}) {
-  const paths:Record<IconName,ReactNode>={
-    landing:<><rect x="3" y="5" width="18" height="14" rx="2"/><path className="icon-accent" d="M3 9h18M7 13h7M7 16h4"/></>,
-    business:<><rect x="4" y="3" width="16" height="18" rx="2"/><path className="icon-accent" d="M8 7h3v3H8zM14 7h2M14 11h2M8 14h8M8 18h5"/></>,
-    portfolio:<><path d="M3 7.5h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM8 7.5V5h8v2.5"/><path className="icon-accent" d="M3 12h18M10 12v2h4v-2"/></>,
-    services:<><path d="M7 3h10l3 3v15H4V6z"/><path className="icon-accent" d="M8 10h8M8 14h8M8 18h5M16.5 3v4H20"/></>,
-    restaurant:<><path d="M7 3v8M4 3v5a3 3 0 0 0 6 0V3M7 11v10M15 3v18M15 3c4 2 5 7 0 10"/><path className="icon-accent" d="M4 8h6"/></>,
-    store:<><path d="M4 9v11h16V9M3 9l2-5h14l2 5"/><path className="icon-accent" d="M3 9a3 3 0 0 0 5 2 3 3 0 0 0 4 0 3 3 0 0 0 4 0 3 3 0 0 0 5-2M9 20v-5h6v5"/></>,
-    calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/><path className="icon-accent" d="M8 14h3v3H8zM14 14h2"/></>,
-    corporate:<><path d="M5 21V3h10v18M15 8h4v13M3 21h18"/><path className="icon-accent" d="M8 7h4M8 11h4M8 15h4M8 19h4"/></>,
-    custom:<><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/><path className="icon-accent" d="M15 3v6M12 6h6M6 15v6M3 18h6"/></>,
-    pages:<><path d="M7 3h10l3 3v15H7z"/><path d="M4 6v15h12"/><path className="icon-accent" d="M10 11h7M10 15h7"/></>,
-    professional:<><rect x="3" y="4" width="18" height="16" rx="2"/><path className="icon-accent" d="M3 9h18M8 9v11M11 13h6M11 16h4"/></>,
-    premium:<><path d="m12 3 8 5-8 13L4 8zM4 8h16"/><path className="icon-accent" d="m8 8 4 13 4-13M8 8l4-5 4 5"/></>,
-    motion:<><path d="M3 8h10M3 12h14M3 16h10"/><path className="icon-accent" d="m15 6 6 6-6 6"/></>,
-    signature:<><path d="M4 19c4-7 7-11 10-12 3-1 5 1 3 4-2 4-7 7-11 8 6-1 10-1 14 0"/><path className="icon-accent" d="m18 3 .7 1.8L21 6l-2.3 1.2L18 9l-.7-1.8L15 6l2.3-1.2z"/></>,
-    cms:<><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h5"/><path className="icon-accent" d="m12 18 5-5 2 2-5 5-3 1z"/></>,
-    blog:<><path d="M4 4h16v16H4z"/><path className="icon-accent" d="M7 8h10M7 12h10M7 16h6"/></>,
-    team:<><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path className="icon-accent" d="M3 20c0-4 2-6 6-6s6 2 6 6M15 15c4 0 6 2 6 5"/></>,
-    testimonials:<><path d="M4 5h16v12H9l-5 4z"/><path className="icon-accent" d="M8 9h8M8 13h5"/></>,
-    faq:<><circle cx="12" cy="12" r="9"/><path className="icon-accent" d="M9.8 9a2.4 2.4 0 1 1 3.2 2.3c-.8.4-1 1-1 1.7M12 17h.01"/></>,
-    copywriting:<><path d="M4 20h4l11-11-4-4L4 16zM13 7l4 4"/><path className="icon-accent" d="M4 20h16"/></>,
-    arabic:<><path d="M5 7v5c0 3 2 4 4 4h8M17 8v8M8 20h9"/><path className="icon-accent" d="M8 5h.01M12 5h.01"/></>,
-    languages:<><path d="M3 5h10M8 3v2c0 5-2 9-5 11M5 10c2 3 4 5 7 6"/><path className="icon-accent" d="m14 20 3-8 3 8M15 17h4"/></>,
-    whatsapp:<><path d="M20 11.5a8 8 0 0 1-12 7L4 20l1.4-3.8A8 8 0 1 1 20 11.5z"/><path className="icon-accent" d="M9 8c.5 3 2.5 5 5.5 6"/></>,
-    form:<><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8"/><path className="icon-accent" d="m8 17 2 2 5-5"/></>,
-    newsletter:<><rect x="3" y="5" width="18" height="14" rx="2"/><path className="icon-accent" d="m4 7 8 6 8-6M7 16h6"/></>,
-    payments:<><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/><path className="icon-accent" d="M7 15h4M17 13v4M15 15h4"/></>,
-    login:<><rect x="9" y="4" width="11" height="16" rx="2"/><path className="icon-accent" d="M3 12h11M10 8l4 4-4 4"/></>,
-    dashboard:<><path d="M4 19a8 8 0 1 1 16 0"/><path d="m12 15 4-5"/><path className="icon-accent" d="M7 19h10"/></>,
-    search:<><circle cx="10.5" cy="10.5" r="6.5"/><path className="icon-accent" d="m16 16 5 5"/></>,
-    filters:<><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/><path className="icon-accent" d="M4 12h16M13 12a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></>,
-    uploads:<><path d="M5 17v3h14v-3M12 4v12M8 8l4-4 4 4"/><path className="icon-accent" d="M8 13h8"/></>,
-    careers:<><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3"/><path className="icon-accent" d="M3 12h18M10 12v2h4v-2"/></>,
-    crm:<><circle cx="8" cy="8" r="3"/><path d="M3 19c0-4 2-6 5-6s5 2 5 6"/><path className="icon-accent" d="M15 7h6M18 4v6M15 14h6M15 18h4"/></>,
-    assistant:<><rect x="4" y="6" width="16" height="13" rx="3"/><path d="M12 3v3M8 11h.01M16 11h.01"/><path className="icon-accent" d="M8 15h8M2 10h2M20 10h2"/></>,
-    qualification:<><path d="M4 5h16l-6 7v6l-4 2v-8z"/><path className="icon-accent" d="m14 17 2 2 4-5"/></>,
-    summaries:<><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4"/><path className="icon-accent" d="M9 11h6M9 15h6M9 18h3"/></>,
-    knowledge:<><path d="M4 5c3-1 6 0 8 2v14c-2-2-5-3-8-2zM20 5c-3-1-6 0-8 2v14c2-2 5-3 8-2z"/><path className="icon-accent" d="M8 9h2M14 9h2"/></>,
-    workflow:<><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8M18 8l-5 8"/><path className="icon-accent" d="m14 4 3 2-3 2"/></>,
-  };
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+  const Icon=estimatorIcons[name];
+  return <Icon size={25} weight="duotone" aria-hidden="true"/>;
 }
 
 const websiteTypes = ["Landing Page","Business Website","Portfolio","Professional Services","Restaurant / Hospitality","Ecommerce","Booking Website","Corporate Website","Custom Digital Experience"];
@@ -100,7 +80,7 @@ const designOptions = [
   {name:"Signature Art Direction",note:"A distinctive visual system and high-touch interactive direction.",icon:"signature" as IconName,tone:"gold" as Tone},
 ];
 const contentOptions = [
-  ["cms","CMS","Update key pages, images and content without touching code.","cms","blue"],["blog","Blog / News","Publish articles, company news and SEO-focused updates.","blog","coral"],["portfolio","Portfolio / Projects","Add and organise projects in a consistent case-study format.","portfolio","violet"],["team","Team section","Manage staff profiles, roles, biographies and profile images.","team","cyan"],["testimonials","Testimonials","Add and update client quotes or reviews as trust grows.","testimonials","pink"],["faq","FAQ management","Keep common customer questions and answers accurate and current.","faq","gold"],["copywriting","Copywriting","Professional page copy shaped around clarity and conversion.","copywriting","indigo"],["arabic","Arabic / RTL","Arabic content with right-to-left layouts designed and tested properly.","arabic","green"],["languages","Additional language","A translated site structure with a clear language switcher.","languages","lime"],
+  ["cms","CMS","Update key pages, images and content without touching code.","cms","blue"],["blog","Blog / News","Publish articles, company news and SEO-focused updates.","blog","coral"],["portfolio","Portfolio / Projects","Add and organise projects in a consistent case-study format.","projects","violet"],["team","Team section","Manage staff profiles, roles, biographies and profile images.","team","cyan"],["testimonials","Testimonials","Add and update client quotes or reviews as trust grows.","testimonials","pink"],["faq","FAQ management","Keep common customer questions and answers accurate and current.","faq","gold"],["copywriting","Copywriting","Professional page copy shaped around clarity and conversion.","copywriting","indigo"],["arabic","Arabic / RTL","Arabic content with right-to-left layouts designed and tested properly.","arabic","green"],["languages","Additional language","A translated site structure with a clear language switcher.","languages","lime"],
 ] as OptionTuple[];
 const businessOptions = [
   ["whatsapp","WhatsApp","A clear click-to-chat action that opens a customer conversation.","whatsapp","green"],["form","Advanced contact form","Detailed or conditional forms that collect the right enquiry information.","form","blue"],["newsletter","Newsletter","Connect sign-ups to your chosen email marketing platform.","newsletter","coral"],["booking","Booking","Let customers choose available times and schedule online.","calendar","pink"],["payments","Online payments","Accept secure online payments through one standard payment gateway.","payments","gold"],["ecommerce","Ecommerce","A starter online store with products, cart and checkout.","store","violet"],["login","Customer login","Give approved customers a secure sign-in area.","login","indigo"],["dashboard","Customer dashboard","A personalised account area for customer information or actions.","dashboard","cyan"],["search","Search","Help visitors quickly find pages, articles or products.","search","blue"],["filters","Advanced filters","Let visitors narrow larger catalogues by useful attributes.","filters","lime"],["uploads","File uploads","Allow customers to securely attach documents or images to forms.","uploads","coral"],["careers","Careers / jobs","Publish structured vacancies and collect job applications.","careers","pink"],["crm","CRM integration","Send leads and enquiry details into your sales pipeline.","crm","green"],
