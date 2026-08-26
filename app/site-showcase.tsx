@@ -6,7 +6,7 @@ export function SiteShowcase() {
   const [split, setSplit] = useState(62);
 
   return <div className="site-showcase transformation-demo" style={{"--split": `${split}%`} as React.CSSProperties}>
-    <div className="transform-toolbar"><span><i/><i/><i/></span><b>STUDIO/AE · LIVE DESIGN DEMO</b><em>INTERACTIVE</em></div>
+    <div className="transform-toolbar"><span><i/><i/><i/></span><b>VEYA LABS · LIVE DESIGN DEMO</b><em>INTERACTIVE</em></div>
     <div className="transform-canvas">
       <div className="template-site" aria-hidden="true">
         <div className="template-nav"><b>COMPANY</b><span>Home&nbsp;&nbsp; About&nbsp;&nbsp; Services&nbsp;&nbsp; Contact</span></div>
