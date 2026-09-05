@@ -40,3 +40,11 @@ next-env.d.ts
 /.sites-runtime/
 /outputs/
 /work/
+
+# TypeScript incremental cache
+*.tsbuildinfo
+
+# Reproducible intermediate Blender project
+scripts/3d/*.blend*
+public/models/*-poster.png
+scripts/3d/*-poster.png

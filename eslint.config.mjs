@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Unmodified upstream Draco decoder; application source remains linted.
+    "public/models/draco/**",
   ]),
 ]);
 
