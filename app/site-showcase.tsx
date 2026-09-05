@@ -1,23 +1,20 @@
 "use client";
-
-import { useState } from "react";
-import { Browser, CalendarCheck, Storefront, ArrowUpRight, Check } from "@phosphor-icons/react";
-
-const routes = [
-  {name:"Introduce my business",icon:Browser,plan:"starter",price:"999",type:"Company website",scope:["Custom responsive design","Contact form + WhatsApp","Search foundations","30 days of launch support"]},
-  {name:"Bring in more enquiries",icon:CalendarCheck,plan:"pro",price:"2,499",type:"Lead generation",scope:["CMS + editable articles","Booking + online payments","Tailored visual direction","60 days of launch support"]},
-  {name:"Build a bigger system",icon:Storefront,plan:"business",price:"4,999",type:"Connected business",scope:["Up to 15 pages","Advanced content structure","Choose an advanced module","90 days of launch support"]},
-];
-
+import Image from 'next/image';
+import { useEffect,useRef,useState } from 'react';
+import { ArrowUpRight, Palette, CalendarCheck, Storefront } from '@phosphor-icons/react';
+import type { WorkstationControl,WorkstationMode } from './workstation-scene';
+const choices=[{id:'brand' as const,label:'Brand',icon:Palette,description:'A distinctive first impression.',plan:'starter'},{id:'book' as const,label:'Book',icon:CalendarCheck,description:'Turn interest into appointments.',plan:'pro'},{id:'shop' as const,label:'Sell',icon:Storefront,description:'Make the next purchase feel effortless.',plan:'business'}];
+const colourNames=['Cobalt','Terracotta','Pine'];
 export function SiteShowcase(){
-  const [selected,setSelected]=useState(1);
-  const route=routes[selected];
-  return <section className="project-console" aria-label="Explore a website starting point">
-    <div className="console-bar"><span>veya / project-builder</span><span>01 — BRIEF</span></div>
-    <div className="console-body"><p className="console-prompt"><span aria-hidden="true">&gt;</span> What should your website do?</p>
-      <div className="console-options">{routes.map((item,index)=>{const Icon=item.icon;return <button key={item.plan} type="button" aria-pressed={selected===index} onClick={()=>setSelected(index)}><Icon size={22} weight="duotone"/><span>{item.name}</span>{selected===index?<Check size={18}/>:<span className="console-index">0{index+1}</span>}</button>})}</div>
-      <div className="console-output" aria-live="polite"><div className="console-output-head"><span>YOUR STARTING POINT</span><span>{route.plan.toUpperCase()}</span></div><h2>{route.type}</h2><ul>{route.scope.map(item=><li key={item}><Check size={16}/>{item}</li>)}</ul><div className="console-price"><span>From <strong>AED {route.price}</strong></span><a href={`/build?plan=${route.plan}`} aria-label={`Customise the ${route.plan} package`}>Make it yours <ArrowUpRight size={18}/></a></div></div>
-      <p className="console-note">A starting point, not a locked package. Edit every choice.</p>
-    </div><div className="console-status"><span>design + development + systems</span><span aria-hidden="true">[ ready ]</span></div>
-  </section>;
+ const host=useRef<HTMLDivElement>(null);const control=useRef<WorkstationControl|null>(null);const [mode,setMode]=useState<WorkstationMode>('brand');const [accent,setAccent]=useState(0);const [ready,setReady]=useState(false);const current=useRef({mode,accent});
+ useEffect(()=>{current.current={mode,accent};control.current?.update(mode,accent)},[mode,accent]);
+ useEffect(()=>{let cancelled=false;import('./workstation-scene').then(async({mountWorkstation})=>{if(cancelled||!host.current)return;const mounted=await mountWorkstation(host.current,(value)=>{if(!cancelled)setReady(value)},setMode,()=>setAccent(value=>(value+1)%3));if(cancelled){mounted.dispose();return}control.current=mounted;mounted.update(current.current.mode,current.current.accent)}).catch(()=>{if(!cancelled)setReady(false)});return()=>{cancelled=true;control.current?.dispose();control.current=null}},[]);
+ const selected=choices.find(choice=>choice.id===mode)!;
+ return <section className={`workstation ${ready?'workstation-ready':''}`} aria-label="Interactive Veya design instrument">
+  <div className="workstation-label"><span>VEYA / 01</span><span>THE DESIGN INSTRUMENT</span></div>
+  <div className="workstation-stage"><Image unoptimized priority className="workstation-poster" src="/models/veya-01-poster.webp" width="1100" height="1100" alt="Veya’s custom silver design workstation with a glass display, mechanical keys and a rotary dial"/><div ref={host} className="workstation-canvas"/><div className="workstation-hint">{ready?'Move to explore. Tap a key.':'Choose your website’s purpose below.'}</div></div>
+  <div className="workstation-controls"><div className="workstation-modes" aria-label="Website purpose">{choices.map(({id,label,icon:Icon})=><button key={id} type="button" aria-pressed={mode===id} onClick={()=>setMode(id)}><Icon size={18} weight="duotone"/>{label}</button>)}</div><div className="workstation-colours" aria-label="Accent colour">{colourNames.map((name,index)=><button key={name} type="button" aria-label={name} aria-pressed={accent===index} className={`colour-${index}`} onClick={()=>setAccent(index)}/>)}</div></div>
+  <div className="workstation-caption"><p aria-live="polite">{selected.description}</p><a href={`/build?plan=${selected.plan}`}>Make it yours <ArrowUpRight size={18}/></a></div>
+  <p className="workstation-disclosure">Interactive concept · Your actual website is designed around your business.</p>
+ </section>;
 }

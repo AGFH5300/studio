@@ -43,3 +43,8 @@ next-env.d.ts
 
 # TypeScript incremental cache
 *.tsbuildinfo
+
+# Reproducible intermediate Blender project
+scripts/3d/*.blend*
+public/models/*-poster.png
+scripts/3d/*-poster.png

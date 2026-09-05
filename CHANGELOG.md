@@ -36,3 +36,12 @@
 - 16 rendered-route and enquiry integration tests passed.
 - Full npm audit (including development dependencies): 0 known vulnerabilities on 2026-09-05.
 - Existing Vinext runtime upgraded to 1.0.0-beta.9 to remove the vulnerable image-size dependency; all routes rechecked.
+
+## 2026-09-05 — Original 3D design instrument
+
+- Replaced the homepage console with Veya / 01, an original Blender-modelled workstation. The model has a live display, mechanical keys, precision enclosure details and a knurled accent dial. No robot or competitor artwork is reused.
+- Visitors can choose Brand, Book or Sell, change the colour accent, and carry the selected starting point into the existing estimator.
+- Pointer-responsive perspective and clickable model controls have equivalent keyboard/touch HTML controls.
+- The 250KB Draco-compressed model, decoder and 48KB WebP poster are served locally. The poster is visible while loading and remains the fallback when WebGL is unavailable.
+- Rendering pauses off-screen and in hidden tabs; reduced-motion disables continuous rendering and pointer tracking.
+- Blender source-generation scripts and the exact screen artwork are included under scripts/3d. The Blender render was visually inspected; browser interaction testing was not performed.
