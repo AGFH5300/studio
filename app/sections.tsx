@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AppWindow, Article, Books, Briefcase, Browser, Building, Buildings, CalendarCheck, CreditCard,
@@ -14,7 +15,7 @@ const formatAED = (value: number) => new Intl.NumberFormat("en-AE").format(value
 
 const plans = [
   { name:"STARTER", price:"999", audience:"For a polished, credible first presence.", tag:"", key:"starter", summary:["Up to 5 pages","Custom responsive design","WhatsApp + contact form","SEO + AEO foundations","Analytics + indexing","2 revisions · 30-day support"], more:["Basic animations","SSL / security setup","Performance optimisation","Google Maps + social links","Search Console + sitemap"] },
-  { name:"PRO", price:"2,499", audience:"For a website built to create leads or sales.", tag:"MOST POPULAR", key:"pro", summary:["Up to 7 pages","More tailored visual direction","CMS + blog / news","Booking + standard payment","On-page SEO + AEO","3 revisions · 60-day support"], more:["Advanced interactions","Editable content","Custom forms","Limited branded graphics","WhatsApp + analytics"] },
+  { name:"PRO", price:"2,499", audience:"For a website built to create leads or sales.", tag:"LEAD GENERATION", key:"pro", summary:["Up to 7 pages","More tailored visual direction","CMS + blog / news","Booking + standard payment","On-page SEO + AEO","3 revisions · 60-day support"], more:["Advanced interactions","Editable content","Custom forms","Limited branded graphics","WhatsApp + analytics"] },
   { name:"BUSINESS", price:"4,999", audience:"For growing businesses with bigger workflows.", tag:"BEST FOR GROWTH", key:"business", summary:["Up to 15 pages","Premium design + motion","Advanced CMS structure","Advanced SEO + AEO","One advanced module","5 revisions · 90-day support"], more:["Choose: Starter Ecommerce","Or: CRM + Automation","Or: AI Website Assistant","Or: Second language / RTL"] },
   { name:"SIGNATURE", price:"9,999+", audience:"For brands that need a category-defining experience.", tag:"BESPOKE", key:"signature", summary:["Up to ~25 pages / custom scope","Bespoke art direction","Premium interaction design","Advanced CMS + analytics","Tailored integrations","Priority · 120-day support"], more:["Ecommerce where needed","CRM + AI integration","Multilingual options","Flexible revision process","Architecture built around you"] },
 ];
@@ -35,6 +36,7 @@ export function Pricing() {
         <a href={`/build?plan=${plan.key}`} className="choose-plan">Choose &amp; customise <span>↗</span></a>
       </article>)}
     </div>
+    <details className="package-comparison"><summary>Compare all four packages <span>+</span></summary><div className="comparison-scroll" tabIndex={0} role="region" aria-label="Package comparison, scroll horizontally on small screens"><table><caption>Choose a starting point, then customise the scope.</caption><thead><tr><th scope="col">Included</th>{plans.map(plan=><th scope="col" key={plan.key}>{plan.name}<small>AED {plan.price}</small></th>)}</tr></thead><tbody>{[["Pages",...plans.map(plan=>plan.summary[0])],["Revisions","2 rounds","3 rounds","5 rounds","Flexible"],["Launch support","30 days","60 days","90 days","120 days"],["Content management","Optional","CMS + blog","Advanced CMS","Advanced CMS"],["Business systems","Contact + WhatsApp","Booking + payment","One advanced module","Tailored integrations"]].map(([label,...values])=><tr key={label}><th scope="row">{label}</th>{values.map((value,index)=><td key={index}>{value}</td>)}</tr>)}</tbody></table></div></details>
     <p className="price-note">Packages cover standard website implementation. Complex applications, major ecommerce, advanced 3D/WebGL and highly bespoke systems are scoped separately.</p>
   </section>;
 }
@@ -102,6 +104,7 @@ const planPresets:Record<PlanKey,PlanPreset> = {
 const planKeys=Object.keys(planPresets) as PlanKey[];
 
 export function Builder() {
+  const router=useRouter();
   const [step,setStep] = useState(1);
   const [website,setWebsite] = useState("Business Website");
   const [pages,setPages] = useState("2–5");
@@ -114,6 +117,7 @@ export function Builder() {
   const [startingPlan,setStartingPlan] = useState<PlanKey|null>(null);
   const [showPlanReview,setShowPlanReview] = useState(false);
   const [reviewing,setReviewing] = useState(false);
+  const [draftPending,setDraftPending] = useState(false);
   const [journeyDecision,setJourneyDecision] = useState("custom-build");
   const [advisorDecision,setAdvisorDecision] = useState("");
   const websiteAuto = useRef<{content:Set<string>;business:Set<string>}>({content:new Set(),business:new Set()});
@@ -132,23 +136,25 @@ export function Builder() {
     const frame=requestAnimationFrame(()=>{
       const preset = new URLSearchParams(window.location.search).get("plan");
       if (preset&&planKeys.includes(preset as PlanKey)) {
-        const key=preset as PlanKey;applyPreset(key);setStartingPlan(key);setShowPlanReview(true);setJourneyDecision("package-selected");
+        const key=preset as PlanKey;applyPreset(key);setStartingPlan(key);setShowPlanReview(true);setJourneyDecision("package-selected");window.history.replaceState(null,"","/build");
       }
       else {
         try {
           const saved=window.sessionStorage.getItem("studioBuilderDraft");
           if(saved){
+            setDraftPending(true);
             const draft=JSON.parse(saved);
             if(websiteTypes.includes(draft.website))setWebsite(draft.website);
             if(pageOptions.includes(draft.pages))setPages(draft.pages);
             if(designOptions.some(option=>option.name===draft.design))setDesign(draft.design);
-            if(Array.isArray(draft.content)){const restoredContent=new Set<string>(draft.content);const hadArabic=restoredContent.has("arabic");if(restoredContent.has("languages"))restoredContent.add("arabic");if(typeof draft.languageAutoArabic!=="boolean")languageAutoArabic.current=restoredContent.has("languages")&&!hadArabic;setContent(restoredContent)}
-            if(Array.isArray(draft.business))setBusiness(new Set(draft.business));
-            if(Array.isArray(draft.ai))setAi(new Set(draft.ai));
+            if(Array.isArray(draft.content)){const restoredContent=new Set<string>(draft.content.filter((id:unknown)=>contentOptions.some(option=>option[0]===id)));const hadArabic=restoredContent.has("arabic");if(restoredContent.has("languages"))restoredContent.add("arabic");if(typeof draft.languageAutoArabic!=="boolean")languageAutoArabic.current=restoredContent.has("languages")&&!hadArabic;setContent(restoredContent)}
+            if(Array.isArray(draft.business))setBusiness(new Set<string>(draft.business.filter((id:unknown)=>businessOptions.some(option=>option[0]===id))));
+            if(Array.isArray(draft.ai))setAi(new Set<string>(draft.ai.filter((id:unknown)=>aiOptions.some(option=>option[0]===id))));
             if(Number.isInteger(draft.step))setStep(Math.min(6,Math.max(1,draft.step)));
             if(planKeys.includes(draft.startingPlan))setStartingPlan(draft.startingPlan);
             if(typeof draft.journeyDecision==="string")setJourneyDecision(draft.journeyDecision);
             if(typeof draft.advisorDecision==="string")setAdvisorDecision(draft.advisorDecision);
+            if(draft.websiteAuto){websiteAuto.current={content:new Set<string>((Array.isArray(draft.websiteAuto.content)?draft.websiteAuto.content:[]).filter((id:unknown)=>contentOptions.some(option=>option[0]===id))),business:new Set<string>((Array.isArray(draft.websiteAuto.business)?draft.websiteAuto.business:[]).filter((id:unknown)=>businessOptions.some(option=>option[0]===id)))}}
             if(typeof draft.languageAutoArabic==="boolean")languageAutoArabic.current=draft.languageAutoArabic;
           }
         } catch {}
@@ -159,9 +165,9 @@ export function Builder() {
   }, []);
 
   useEffect(()=>{
-    if(!hydrated)return;
-    window.sessionStorage.setItem("studioBuilderDraft",JSON.stringify({website,pages,design,content:[...content],business:[...business],ai:[...ai],step,startingPlan,journeyDecision,advisorDecision,languageAutoArabic:languageAutoArabic.current}));
-  },[hydrated,website,pages,design,content,business,ai,step,startingPlan,journeyDecision,advisorDecision]);
+    if(!hydrated||draftPending)return;
+    try { window.sessionStorage.setItem("studioBuilderDraft",JSON.stringify({website,pages,design,content:[...content],business:[...business],ai:[...ai],step,startingPlan,journeyDecision,advisorDecision,languageAutoArabic:languageAutoArabic.current,websiteAuto:{content:[...websiteAuto.current.content],business:[...websiteAuto.current.business]}})); } catch {}
+  },[hydrated,draftPending,website,pages,design,content,business,ai,step,startingPlan,journeyDecision,advisorDecision]);
 
   const toggle = (group:"content"|"business"|"ai", id:string) => {
     const current = group === "content" ? content : group === "business" ? business : ai;
@@ -191,6 +197,7 @@ export function Builder() {
     if(group === "business" && id === "login" && !next.has("login") && next.has("dashboard")) return;
     if(group === "business" && id === "crm" && !next.has("crm") && (ai.has("qualification") || ai.has("workflow"))) return;
     if(group === "ai" && (id === "qualification" || id === "workflow") && next.has(id)) setBusiness(prev => new Set(prev).add("crm"));
+    if(group!=="ai")websiteAuto.current[group].delete(id);
     setter(next);
     setQuotePulse(true); window.setTimeout(() => setQuotePulse(false), 260);
   };
@@ -286,24 +293,26 @@ export function Builder() {
   const submitConfig=(decisionOverride?:string)=>{
     const comparison=startingChanges||nearestChanges;
     const detail={website,pages,design,features:chosen.map(x=>labels[x]),content:[...content].map(x=>labels[x]),business:[...business].map(x=>labels[x]),ai:[...ai].map(x=>labels[x]),estimate,recommendation:recommendation.name,nearestPackage:planPresets[nearestPlan.key].name,nearestPackagePrice:planPresets[nearestPlan.key].price,origin:startingPlan?"package":"custom",startedFrom:startingPlan?planPresets[startingPlan].name:null,journeyDecision:decisionOverride||journeyDecision,advisorDecision:advisorDecision||"not-chosen",added:comparison.added,removed:comparison.removed,changed:comparison.changed,fitActions,automaticLogic:dependencyNotes};
-    window.sessionStorage.setItem("studioConfig", JSON.stringify(detail));
-    window.location.assign("/contact");
+    try { window.sessionStorage.setItem("studioConfig", JSON.stringify(detail)); } catch { window.alert("Your browser has disabled local storage. Download your brief from Review estimate, then attach its contents to your enquiry."); return; }
+    router.push("/contact");
   };
   const useNearestPackage=()=>{applyPreset(nearestPlan.key);setJourneyDecision("matched-nearest-package");setAdvisorDecision(`matched-${nearestPlan.key}`);setQuotePulse(true);window.setTimeout(()=>setQuotePulse(false),260)};
   const goToStep=(nextStep:number)=>{
     setReviewing(false);
     setStep(nextStep);
-    window.requestAnimationFrame(()=>document.querySelector(".builder-main")?.scrollIntoView({behavior:"smooth",block:"start"}));
+    window.requestAnimationFrame(()=>{document.querySelector<HTMLElement>(".builder-panel")?.focus({preventScroll:true});document.querySelector(".builder-main")?.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})});
   };
   const showEstimateReview=()=>{
     setReviewing(true);setJourneyDecision("reviewing-estimate");
-    window.requestAnimationFrame(()=>document.querySelector(".builder-main")?.scrollIntoView({behavior:"smooth",block:"start"}));
+    window.requestAnimationFrame(()=>{document.querySelector<HTMLElement>(".builder-panel")?.focus({preventScroll:true});document.querySelector(".builder-main")?.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})});
   };
   const resetBuilder=()=>{
     websiteAuto.current={content:new Set(),business:new Set()};languageAutoArabic.current=false;
     setWebsite("Business Website");setPages("2–5");setDesign("Professional");setContent(new Set());setBusiness(new Set());setAi(new Set());setStep(1);
     setStartingPlan(null);setShowPlanReview(false);setReviewing(false);setJourneyDecision("custom-build");setAdvisorDecision("");
-    window.sessionStorage.removeItem("studioBuilderDraft");window.sessionStorage.removeItem("studioConfig");
+    setDraftPending(false);
+    try {window.sessionStorage.removeItem("studioBuilderDraft");window.sessionStorage.removeItem("studioConfig");} catch {}
+    window.history.replaceState(null,"","/build");
   };
   const phases=["Website","Pages","Design","Content","Features","AI"];
   const dependencyNotes=[
@@ -320,9 +329,15 @@ export function Builder() {
     return <article className="review-group"><header><span>{number}</span><h4>{title}</h4><button type="button" onClick={()=>goToStep(editStep)}>Edit</button></header><div className="review-items">{selectedItems.length?selectedItems.map(([id,label,,icon,tone])=><div key={id}><span className={`estimator-icon tone-${tone}`}><EstimatorIcon name={icon}/></span><p><strong>{label}</strong><small>{isAutoAdded(id)?"Included automatically":"Selected"}</small></p></div>):<p className="review-empty">No optional modules selected.</p>}</div></article>;
   };
 
+  const downloadBrief=()=>{
+    const brief=["VEYA LABS — WEBSITE BRIEF",`Website: ${website}`,`Pages: ${pages}`,`Design: ${design}`,`Indicative estimate: AED ${formatAED(estimate)}`,"","SELECTED MODULES",...chosen.map(id=>`- ${labels[id]}`),"","DEPENDENCIES",...dependencyNotes,"",`Nearest package: ${planPresets[nearestPlan.key].name} — AED ${planPresets[nearestPlan.key].price}`,"Package changes:",...fitActions,"","Indicative scope only. Final proposal and third-party fees confirmed separately."].join("\n");
+    const url=URL.createObjectURL(new Blob([brief],{type:"text/plain;charset=utf-8"}));const link=document.createElement("a");link.href=url;link.download="Veya-Labs-Website-Brief.txt";link.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+  if(draftPending)return <section className="draft-gate"><small>YOUR SAVED PROJECT</small><h2>Pick up where you left off?</h2><p>A previous estimate is saved in this browser tab. Continue with that scope, or start fresh at AED 999 with no optional features selected.</p><div><button type="button" onClick={()=>setDraftPending(false)}>Continue previous estimate</button><button type="button" onClick={resetBuilder}>Start a new estimate</button></div></section>;
+
   if(showPlanReview&&startingPlan){
     const selected=planPresets[startingPlan];const included=[...selected.content,...selected.business,...selected.ai].map(id=>labels[id]);
-    return <section className="builder-section package-entry-section section-pad"><div className="builder-heading"><div className="section-kicker light"><span>YOUR CHOSEN STARTING POINT</span><i/></div><h2>Make {selected.name}<br/><em>work for you.</em></h2><p>Keep the package exactly as selected, or open it with every choice pre-filled and add or remove what you need.</p></div><div className="package-entry-card"><div className="package-entry-top"><div><small>SELECTED PACKAGE</small><h3>{selected.name}</h3><p>{selected.pages} pages · {selected.design}</p></div><strong><span>AED</span> {selected.price}</strong></div><div className="package-entry-scope"><div><small>PRE-FILLED SCOPE</small><ul><li>{selected.website}</li><li>{selected.pages} pages</li><li>{selected.design}</li>{included.map(item=><li key={item}>{item}</li>)}</ul></div><p>Nothing is locked. The final estimate is still calculated from the exact scope you choose, and individual item rates remain hidden.</p></div><div className="package-entry-actions"><button type="button" className="package-customise" onClick={()=>{setShowPlanReview(false);setJourneyDecision("customizing-package")}}>Customise this package <span>→</span></button><button type="button" className="package-continue" onClick={()=>submitConfig("package-as-selected")}>Continue with this package <span>↗</span></button><button type="button" className="package-scratch" onClick={()=>{languageAutoArabic.current=false;setStartingPlan(null);setShowPlanReview(false);setReviewing(false);setJourneyDecision("custom-build");setAdvisorDecision("");setWebsite("Business Website");setPages("2–5");setDesign("Professional");setContent(new Set());setBusiness(new Set());setAi(new Set())}}>Build from scratch instead</button></div></div></section>;
+    return <section className="builder-section package-entry-section section-pad"><div className="builder-heading"><div className="section-kicker light"><span>YOUR CHOSEN STARTING POINT</span><i/></div><h2>Make {selected.name}<br/><em>work for you.</em></h2><p>Keep the package exactly as selected, or open it with every choice pre-filled and add or remove what you need.</p></div><div className="package-entry-card"><div className="package-entry-top"><div><small>SELECTED PACKAGE</small><h3>{selected.name}</h3><p>{selected.pages} pages · {selected.design}</p></div><strong><span>AED</span> {selected.price}</strong></div><div className="package-entry-scope"><div><small>PRE-FILLED SCOPE</small><ul><li>{selected.website}</li><li>{selected.pages} pages</li><li>{selected.design}</li>{included.map(item=><li key={item}>{item}</li>)}</ul></div><p>Make this package your own. Your estimate updates if you change the scope.</p></div><div className="package-entry-actions"><button type="button" className="package-customise" onClick={()=>{setShowPlanReview(false);setJourneyDecision("customizing-package")}}>Customise this package <span>→</span></button><button type="button" className="package-continue" onClick={()=>submitConfig("package-as-selected")}>Continue with this package <span>↗</span></button><button type="button" className="package-scratch" onClick={()=>{languageAutoArabic.current=false;setStartingPlan(null);setShowPlanReview(false);setReviewing(false);setJourneyDecision("custom-build");setAdvisorDecision("");setWebsite("Business Website");setPages("2–5");setDesign("Professional");setContent(new Set());setBusiness(new Set());setAi(new Set())}}>Build from scratch instead</button></div></div></section>;
   }
 
   return <section className="builder-section section-pad" id="builder">
@@ -334,10 +349,10 @@ export function Builder() {
           <div className="builder-progress" aria-label="Estimator progress">{phases.map((x,i)=><button type="button" key={x} className={`${!reviewing&&step===i+1?"active":""} ${(reviewing||step>i+1)?"done":""}`} aria-label={`${x}, step ${i+1} of 6`} aria-current={!reviewing&&step===i+1?"step":undefined} onClick={()=>goToStep(i+1)}><span>{(reviewing||step>i+1)?"✓":i+1}</span><strong>{x}</strong></button>)}</div>
           <div className="progress-line" aria-hidden="true"><i style={{width:reviewing?"100%":`${((step-1)/5)*100}%`}}/></div>
         </div>
-        <div className="builder-panel">
+        <div className="builder-panel" tabIndex={-1}>
           {reviewing?<div className="estimate-review">
-            <header className="estimate-review-head"><div><small>YOUR WEBSITE BRIEF</small><h3>Review your estimate.</h3><p>Check the complete scope before sending it to Veya Labs. You can edit any section without losing your selections.</p></div><div className="review-total"><small>INDICATIVE PROJECT ESTIMATE</small><strong><span>AED</span> {formatAED(estimate)}</strong><p>The final proposal follows a concise scope review. Individual item rates remain private.</p></div></header>
-            <div className="review-foundation"><header><span>01</span><h4>Project foundation</h4><button type="button" onClick={()=>goToStep(1)}>Edit</button></header><dl><div><dt>Website</dt><dd>{website}</dd></div><div><dt>Pages</dt><dd>{pages}</dd></div><div><dt>Design</dt><dd>{design}</dd></div></dl></div>
+            <header className="estimate-review-head"><div><small>YOUR WEBSITE BRIEF</small><h3>Review your estimate.</h3><p>Check the complete scope before sending it to Veya Labs. You can edit any section without losing your selections.</p></div><div className="review-total"><small>INDICATIVE PROJECT ESTIMATE</small><strong><span>AED</span> {formatAED(estimate)}</strong><p>Your final proposal confirms the scope, delivery schedule and any third-party fees.</p></div></header>
+            <div className="brief-tools"><button type="button" onClick={downloadBrief}>Download project brief</button><button type="button" onClick={()=>window.print()}>Print / save as PDF</button></div><div className="review-foundation"><header><span>01</span><h4>Project foundation</h4><button type="button" onClick={()=>goToStep(1)}>Edit</button></header><dl><div><dt>Website</dt><dd>{website}</dd></div><div><dt>Pages</dt><dd>{pages}</dd></div><div><dt>Design</dt><dd>{design}</dd></div></dl></div>
             <div className="review-groups">{renderReviewGroup("02","Content & languages",contentOptions,content,4)}{renderReviewGroup("03","Business features",businessOptions,business,5)}{renderReviewGroup("04","AI & automation",aiOptions,ai,6)}</div>
             <div className="review-bottom"><section className="review-logic"><small>AUTOMATIC LOGIC</small><h4>Dependencies handled for you.</h4>{dependencyNotes.length?<ul>{dependencyNotes.map(note=><li key={note}><span>✓</span>{note}</li>)}</ul>:<p>No additional dependencies were needed for this scope.</p>}</section><aside className="review-match"><div className="review-match-label"><small>SMART PLAN MATCH</small><b>{fitActions.length===0?"MATCHED":`${fitActions.length} CHANGES AWAY`}</b></div><div className="review-match-title"><h4>{planPresets[nearestPlan.key].name}</h4><strong><span>AED</span> {planPresets[nearestPlan.key].price}</strong></div><p>Your configuration is priced from its exact selections. The package is shown only as the nearest ready-made reference.</p>{fitActions.length>0&&<><ul>{fitActions.slice(0,4).map(action=><li key={action}>{action}</li>)}</ul><button type="button" onClick={useNearestPackage}>Use {planPresets[nearestPlan.key].name} instead</button></>}</aside></div>
             <footer className="review-actions"><div><small>WHAT HAPPENS NEXT</small><p>Your full scope, estimate and package comparison will be attached to the enquiry form for the Veya Labs team.</p></div><button type="button" className="review-edit" onClick={()=>goToStep(6)}>Edit selections</button><button type="button" className="review-continue" onClick={()=>submitConfig("reviewed-estimate")}>Continue to contact <span>↗</span></button></footer>
@@ -357,7 +372,7 @@ export function Builder() {
       </div>
       <aside className={`live-quote ${quotePulse?"pulse":""}`}>
         <div className="quote-label"><span>YOUR LIVE SCOPE</span><i><b/> UPDATES INSTANTLY</i></div>
-        <div className="quote-price"><small>Indicative project estimate</small><strong><span>AED</span> {formatAED(estimate)}</strong><p>No item prices are exposed. The total updates from the exact scope you choose.</p></div>
+        <div className="quote-price"><small>Indicative project estimate</small><strong><span>AED</span> {formatAED(estimate)}</strong><p>Your total updates as you choose. Review the full scope before making an enquiry.</p></div>
         <div className="quote-basics"><button type="button" onClick={()=>goToStep(1)}><span>Website</span><strong>{website}</strong><i>EDIT</i></button><button type="button" onClick={()=>goToStep(2)}><span>Pages</span><strong>{pages}</strong><i>EDIT</i></button><button type="button" onClick={()=>goToStep(3)}><span>Design</span><strong>{design}</strong><i>EDIT</i></button></div>
         <div className="quote-features"><span>INCLUDED IN THIS SCOPE <b>{chosen.length}</b></span><div>{chosen.length?chosen.slice(0,6).map(x=><small key={x}>{labels[x]}</small>):<p>Add content, business or AI features to refine the estimate.</p>}{chosen.length>6&&<small>+{chosen.length-6} more</small>}</div></div>
         {startingPlan&&startingChanges&&<div className="plan-origin"><small>STARTED FROM {planPresets[startingPlan].name}</small><p>{startingChanges.added.length+startingChanges.removed.length+startingChanges.changed.length===0?"No changes yet.":`${startingChanges.added.length} added · ${startingChanges.removed.length} removed · ${startingChanges.changed.length} changed`}</p></div>}
