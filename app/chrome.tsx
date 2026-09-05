@@ -26,16 +26,18 @@ export function SiteHeader() {
   }, []);
 
   useEffect(()=>{const frame=requestAnimationFrame(()=>setDark(document.documentElement.dataset.theme==="dark"));return()=>cancelAnimationFrame(frame)},[]);
-  const toggleTheme=()=>{const next=!dark;setDark(next);document.documentElement.dataset.theme=next?"dark":"light";localStorage.setItem("veya-theme",next?"dark":"light")};
+  const toggleTheme=()=>{const next=!dark;setDark(next);document.documentElement.dataset.theme=next?"dark":"light";try{localStorage.setItem("veya-theme",next?"dark":"light")}catch{}};
+
+  useEffect(()=>{if(!open)return;const close=(event:KeyboardEvent)=>{if(event.key==="Escape")setOpen(false)};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close)},[open]);
 
   const darkTop = ["/build","/contact"].includes(pathname);
   return <header className={`site-header ${scrolled ? "scrolled" : ""} ${darkTop ? "over-dark" : ""}`}>
     <Link className="brand" href="/" aria-label="Veya Labs home">Veya<span> Labs</span></Link>
-    <nav className={open ? "open" : ""} aria-label="Primary navigation">
-      {navItems.map(([label, href]) => <a className={pathname===href?"active":""} key={href} href={href} onClick={() => setOpen(false)}>{label}</a>)}
+    <nav id="primary-navigation" className={open ? "open" : ""} aria-label="Primary navigation">
+      {navItems.map(([label, href]) => <a aria-current={pathname===href?"page":undefined} className={pathname===href?"active":""} key={href} href={href} onClick={() => setOpen(false)}>{label}</a>)}
     </nav>
     <div className="header-actions"><button className="theme-toggle" onClick={toggleTheme} aria-label={`Switch to ${dark?"light":"dark"} mode`}><i>{dark?"☼":"◐"}</i><span>{dark?"Light":"Dark"}</span></button><a className="header-cta" href="/contact">Start a project <span>↗</span></a></div>
-    <button className="menu-button" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}><i /><i /></button>
+    <button className="menu-button" aria-controls="primary-navigation" aria-label={open?"Close menu":"Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}><i /><i /></button>
   </header>;
 }
 

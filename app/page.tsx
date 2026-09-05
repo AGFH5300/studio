@@ -3,11 +3,11 @@ import { SiteShowcase } from "./site-showcase";
 export default function Home() {
   return (
     <main>
-      <section className="hero" id="top">
+      <section className="hero lab-hero" id="top">
         <div className="hero-grid" aria-hidden="true"><i /><i /><i /><i /></div>
         <div className="hero-copy">
           <div className="eyebrow reveal"><span /> UAE WEB DESIGN + DIGITAL SYSTEMS</div>
-          <h1 className="hero-title reveal"><span>Beautiful websites.</span><span className="hero-serif">Built to do <em>business.</em></span></h1>
+          <h1 className="hero-title reveal"><span>Beautiful websites.</span><span className="hero-serif">Built to do<br/><em>business.</em></span></h1>
           <div className="hero-bottom reveal">
             <p>Design, development, ecommerce, SEO and intelligent automation for ambitious UAE businesses.</p>
             <div className="hero-actions"><a className="button button-dark" href="/build">Build your website <b>↗</b></a><a className="text-link" href="/services">See what we build <span>↗</span></a></div>
@@ -17,7 +17,7 @@ export default function Home() {
       </section>
 
       <section className="signal-strip" aria-label="Key benefits">
-        {[["01", "Custom design", "Never off-the-shelf"],["02", "Clear pricing", "From AED 999"],["03", "Search ready", "SEO + AEO foundations"],["04", "Built to grow", "CMS, commerce + AI"]].map(([num, title, text]) => <div className="signal" key={num}><small>{num}</small><strong>{title}</strong><span>{text}</span></div>)}
+        {[["01", "Custom design", "Designed around you"],["02", "Clear pricing", "From AED 999"],["03", "Search ready", "SEO + AEO foundations"],["04", "Built to grow", "CMS, commerce + AI"]].map(([num, title, text]) => <div className="signal" key={num}><small>{num}</small><strong>{title}</strong><span>{text}</span></div>)}
       </section>
 
       <section className="intro section-pad" id="about">
@@ -26,7 +26,7 @@ export default function Home() {
       </section>
 
       <section className="studio-standard section-pad" aria-labelledby="standard-title">
-        <div className="section-heading"><div><div className="section-kicker light"><span>THE STUDIO STANDARD</span><i /></div><h2 id="standard-title">Professional isn&apos;t a look.<br/><em>It&apos;s a system.</em></h2></div><p>Every build follows the same quality framework—from the first business goal to the final responsive detail.</p></div>
+        <div className="section-heading"><div><div className="section-kicker light"><span>THE STUDIO STANDARD</span><i /></div><h2 id="standard-title">Good work.<br/><em>By design.</em></h2></div><p>Every build follows the same quality framework—from the first business goal to the final responsive detail.</p></div>
         <div className="standard-flow" aria-label="Our website quality framework">
           {[["01","Direction","Goals, audience and the action your website needs to earn."],["02","Structure","Clear journeys, content hierarchy and search-ready architecture."],["03","Interface","A distinctive responsive design system with purposeful motion."],["04","Engineering","Fast, accessible implementation with the right integrations."],["05","Launch","Testing, analytics, indexing, handover and post-launch support."]].map(([number,title,copy])=><article key={number}><small>{number}</small><h3>{title}</h3><p>{copy}</p><span aria-hidden="true">↗</span></article>)}
         </div>
