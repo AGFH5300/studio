@@ -59,3 +59,17 @@
 Validation: production build and TypeScript pass; 17 rendered-route, enquiry and asset checks pass. Estimator source hash matches the checkpoint. Blender poster visually inspected. No browser interaction testing was performed. Founder email configuration remains outside this design-only change.
 
 Technical references: https://www.blender.org/releases/4-5/ and https://threejs.org/docs/pages/GLTFLoader.html
+
+## 2026-09-06 — Explorable campus, replacing the agency-page structure
+
+- Replaced the scrolling promotional layout with a persistent, original Blender-built miniature campus. Six interactive locations connect to the actual site routes.
+- Visitors can orbit the camera, click to walk, use WASD/arrows, jump, visit a nearby building with Enter, zoom, reset the map and change day/evening lighting.
+- Added grid pathfinding and collision bounds around buildings, the courtyard pool and platform edges.
+- Rebuilt every route as a compact in-world document or workshop panel. Removed the oversized headlines, promotional marquee and giant footer from the active layout. Normal headings are 25–30px.
+- Added responsive direct navigation for mobile and WebGL fallback. Heavy interaction is hidden/paused while full-width estimator and contact panels are open.
+- Model: 456,996 bytes; rendered poster: 46,240 bytes. All assets and the Draco decoder are served locally.
+- Estimator implementation, contact form/API, dependencies and lockfile remain byte-for-byte identical to the original version-27 checkpoint. Styling only. Original rollback version 27 and named source branch remain available; the intermediate version 29 is also saved.
+
+Validation: TypeScript and production build pass; all six walking destinations are reachable and routes avoid obstacles. Existing route/enquiry checks and campus asset checks pass. Blender render visually inspected. Browser interaction testing was not performed.
+
+Interaction references: Bruno Simon’s explorable portfolio (https://bruno-simon.com/) and its author’s case study (https://medium.com/@bruno_simon/bruno-simon-portfolio-case-study-960402cc259b). The artwork, world layout and character here are original. Camera implementation follows Three.js OrbitControls (https://threejs.org/docs/pages/OrbitControls.html).

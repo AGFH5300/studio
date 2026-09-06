@@ -1,4 +1,3 @@
-import Link from "next/link";
-import ContactForm from "./contact-form";
-export const metadata={title:"Let’s Talk — Veya Labs",description:"An idea, a challenge or a ready-to-go brief. Your next chapter starts with a conversation."};
-export default function ContactPage(){return <main className="vl-main"><section className="vl-contact"><div className="vl-contact-intro"><span className="vl-label">OPEN A CONVERSATION</span><h1>Big idea?<br/>Small question?<br/><em>We’re all ears.</em></h1><p>You don’t need a perfect brief. Tell us where you are and where you want to go.</p><div className="vl-contact-note"><span>01 / SHARE THE AMBITION</span><span>02 / EXPLORE THE POSSIBILITIES</span><span>03 / AGREE THE NEXT MOVE</span></div><Link className="vl-link" href="/build">Want a number first? Try the estimator <span>↗</span></Link></div><div className="vl-contact-form"><div className="vl-form-heading"><span className="vl-label">YOUR NEXT CHAPTER</span><p>Tell us a little about it.</p></div><ContactForm/></div></section></main>}
+import ContactForm from './contact-form';
+export const metadata={title:"The Welcome Desk — Veya Labs",description:"Tell us a little about your project."};
+export default function ContactPage(){return <main className="room-content room-contact"><header><span className="room-eyebrow">The welcome desk</span><h1>Tell us what you have in mind.</h1><p>An idea, a challenge or a ready-to-go brief. A little context is all we need to begin.</p></header><ContactForm/></main>}
