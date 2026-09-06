@@ -1,2 +1,1 @@
-import Link from "next/link";
-export default function NotFound(){return <main className="vl-main vl-404"><span className="vl-label">UNEXPECTED DETOUR</span><strong aria-hidden="true">404</strong><h1>Uncharted territory.</h1><p>This page isn’t part of the experiment. Let’s get you back to the good stuff.</p><Link className="vl-button" href="/">Back to the lab <span>↗</span></Link></main>}
+export default function NotFound(){return <main className="room-content"><header><span className="room-eyebrow">A little detour · 404</span><h1>This place isn’t on the map.</h1><p>Let’s take you back to the campus.</p></header><a className="room-action" href="/">Back to the map <span>↗</span></a></main>}
