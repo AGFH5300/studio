@@ -10,7 +10,7 @@ for(const path of ['/','/services','/pricing','/process','/about','/build','/con
   assert.equal(response.status,200);
   assert.equal(response.headers.get('x-content-type-options'),'nosniff');
   const html=await response.text();assert.match(html,/Veya/);assert.match(html,/main-content/);
-  if(path==='/')assert.match(html,/THE DESIGN INSTRUMENT/);
+  if(path==='/')assert.match(html,/VEYA CORE/);
   if(path==='/build'){assert.match(html,/999/);assert.doesNotMatch(html,/3,194/)}
  });
 }

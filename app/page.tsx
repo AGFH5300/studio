@@ -1,47 +1,9 @@
-import { SiteShowcase } from "./site-showcase";
-
-export default function Home() {
-  return (
-    <main>
-      <section className="hero lab-hero" id="top">
-        <div className="hero-grid" aria-hidden="true"><i /><i /><i /><i /></div>
-        <div className="hero-copy">
-          <div className="eyebrow reveal"><span /> UAE WEB DESIGN + DIGITAL SYSTEMS</div>
-          <h1 className="hero-title reveal"><span>Beautiful websites.</span><span className="hero-serif">Built to do<br/><em>business.</em></span></h1>
-          <div className="hero-bottom reveal">
-            <p>Design, development, ecommerce, SEO and intelligent automation for ambitious UAE businesses.</p>
-            <div className="hero-actions"><a className="button button-dark" href="/build">Build your website <b>↗</b></a><a className="text-link" href="/services">See what we build <span>↗</span></a></div>
-          </div>
-        </div>
-        <SiteShowcase />
-      </section>
-
-      <section className="signal-strip" aria-label="Key benefits">
-        {[["01", "Custom design", "Designed around you"],["02", "Clear pricing", "From AED 999"],["03", "Search ready", "SEO + AEO foundations"],["04", "Built to grow", "CMS, commerce + AI"]].map(([num, title, text]) => <div className="signal" key={num}><small>{num}</small><strong>{title}</strong><span>{text}</span></div>)}
-      </section>
-
-      <section className="intro section-pad" id="about">
-        <div className="section-kicker"><span>WHY WE EXIST</span><i /></div>
-        <div className="intro-copy"><h2>A better website shouldn&apos;t require a <span>bigger agency.</span></h2><div><p>We combine agency-grade creative direction with a modern, efficient build process. You get a site that feels considered, works hard, and costs what it should.</p><a className="arrow-link" href="/services">See what we build <span>↗</span></a></div></div>
-      </section>
-
-      <section className="studio-standard section-pad" aria-labelledby="standard-title">
-        <div className="section-heading"><div><div className="section-kicker light"><span>THE STUDIO STANDARD</span><i /></div><h2 id="standard-title">Good work.<br/><em>By design.</em></h2></div><p>Every build follows the same quality framework—from the first business goal to the final responsive detail.</p></div>
-        <div className="standard-flow" aria-label="Our website quality framework">
-          {[["01","Direction","Goals, audience and the action your website needs to earn."],["02","Structure","Clear journeys, content hierarchy and search-ready architecture."],["03","Interface","A distinctive responsive design system with purposeful motion."],["04","Engineering","Fast, accessible implementation with the right integrations."],["05","Launch","Testing, analytics, indexing, handover and post-launch support."]].map(([number,title,copy])=><article key={number}><small>{number}</small><h3>{title}</h3><p>{copy}</p><span aria-hidden="true">↗</span></article>)}
-        </div>
-        <div className="quality-rail"><span>RESPONSIVE BY DEFAULT</span><span>SEARCH STRUCTURED</span><span>ACCESSIBILITY CONSIDERED</span><span>PERFORMANCE BUDGETED</span></div>
-      </section>
-
-      <section className="services-preview section-pad" id="services">
-        <div className="section-kicker"><span>WHAT WE BUILD</span><i /></div>
-        <div className="services-head"><h2>Design that gets attention.<br/><em>Technology that gets work done.</em></h2><p>One partner from the first sketch to launch—and the systems that come after.</p></div>
-        <div className="service-rows">
-          {[["01", "Web design", "Brand-led UX, responsive interfaces and conversion-focused layouts."],["02", "Development", "Fast modern websites, CMS, booking, payments and custom functionality."],["03", "SEO + AEO", "Clear structure for search engines—and the AI systems answering your customers."],["04", "AI + automation", "Assistants, lead qualification, summaries and practical business workflows."],["05", "Ecommerce", "Storefronts, payments, collections and a better path from browse to buy."],["06", "Integrations", "CRM, WhatsApp, analytics, booking, newsletters and the tools you already use."]].map(([num, title, text]) => <a href="/services" key={num}><small>{num}</small><h3>{title}</h3><p>{text}</p><span>↗</span></a>)}
-        </div>
-      </section>
-
-      <section className="coming-slice" id="pricing"><div><small>WEBSITES FROM</small><strong><sup>AED</sup> 999</strong></div><p>Built beautifully.<br/>Priced clearly.</p><a href="/pricing">Explore packages <span>↗</span></a></section>
-    </main>
-  );
-}
+import Link from "next/link";
+import { LabSculpture, CapabilityExplorer, BuildInvitation } from "./lab-interactions";
+export default function Home(){return <main className="vl-main">
+<section className="vl-hero"><div className="vl-hero-meta vl-label"><span>INDEPENDENT DIGITAL LAB / UAE</span><span>DESIGN × TECHNOLOGY × AMBITION</span></div><h1>Make yourself<br/><em>impossible</em><br/>to ignore<span className="vl-period">.</span></h1><div className="vl-hero-art"><LabSculpture/></div><div className="vl-hero-bottom"><p>We turn ambitious businesses into unforgettable digital experiences. Designed to move people. Built to move business.</p><Link className="vl-button" href="/build">Build your next chapter <span>↗</span></Link><span className="vl-label vl-scroll">SCROLL TO DISCOVER ↓</span></div></section>
+<div className="vl-marquee" aria-label="Design, development, commerce and intelligence"><div aria-hidden="true">DESIGN WITH INTENT <b>✳</b> BUILD WITH PRECISION <b>✳</b> THINK BEYOND THE PAGE <b>✳</b> DESIGN WITH INTENT <b>✳</b> BUILD WITH PRECISION <b>✳</b> THINK BEYOND THE PAGE <b>✳</b></div></div>
+<section className="vl-intro vl-pad"><span className="vl-label">01 / THE BIGGER PICTURE</span><h2>Your website isn’t<br/>the destination.<br/><span>It’s the beginning.</span></h2><div className="vl-intro-bottom"><span className="vl-cross" aria-hidden="true">✳</span><p>A first impression. A booking. A sale. A conversation that changes everything. We connect expressive design with the systems that make those moments happen.</p><Link href="/about" className="vl-link">Meet the lab <span>↗</span></Link></div></section>
+<CapabilityExplorer/>
+<section className="vl-statement vl-pad"><span className="vl-label">03 / SMALL TEAM. FULL PICTURE.</span><h2>Less agency.<br/><em>More chemistry.</em></h2><div className="vl-statement-grid">{[["Direct by design","Work with the people making the decisions and building the experience."],["Nothing in a black box","Know what you’re getting, what it costs and what happens next."],["Made to keep moving","A website you can own, update and build on as the business grows."]].map(([t,p],i)=><article key={t}><span>0{i+1}</span><h3>{t}</h3><p>{p}</p></article>)}</div><Link className="vl-link" href="/process">Inside our process <span>↗</span></Link></section>
+<BuildInvitation/></main>}

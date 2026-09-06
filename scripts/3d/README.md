@@ -22,3 +22,10 @@ Equivalent labelled HTML controls provide keyboard and touch access.
 The 3D experience is progressive enhancement: a poster is visible before
 loading, the controls and estimator links remain usable without WebGL, and
 rendering pauses off-screen/in hidden tabs. Reduced motion disables tracking.
+
+
+## Veya Core — full redesign
+
+`build-core.py` builds the layered monogram from original geometry and exports the seven separately movable layers to `public/models/veya-core.glb`. Run in Blender 4.5 LTS with the project root after `--`. Convert the rendered `scripts/3d/veya-core.png` to `public/models/veya-core.webp` at quality 88. The PNG and `.blend` are reproducible intermediates. Source geometry and final GLB/WebP are retained in Git.
+
+The browser uses local Draco decoding, selectable finishes, explicit rotation and assembly controls, and reduced-motion behavior. No third-party model or artwork is used.

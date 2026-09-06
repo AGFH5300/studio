@@ -48,3 +48,5 @@ next-env.d.ts
 scripts/3d/*.blend*
 public/models/*-poster.png
 scripts/3d/*-poster.png
+
+scripts/3d/veya-core.png

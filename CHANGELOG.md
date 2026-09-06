@@ -45,3 +45,17 @@
 - The 250KB Draco-compressed model, decoder and 48KB WebP poster are served locally. The poster is visible while loading and remains the fallback when WebGL is unavailable.
 - Rendering pauses off-screen and in hidden tabs; reduced-motion disables continuous rendering and pointer tracking.
 - Blender source-generation scripts and the exact screen artwork are included under scripts/3d. The Blender render was visually inspected; browser interaction testing was not performed.
+
+## 2026-09-06 — Full creative redesign
+
+- Secured the previous published design as archive-backed Sites version 27 and GitHub branch `rollback/pre-full-redesign-2026-09-06`. Restore instructions and exact source provenance are in ROLLBACK.md.
+- Rebuilt every route: Home, Capabilities, Pricing, Process, About, Estimator, Contact, Privacy and the not-found experience. New site-wide navigation, footer, typography, colour system and page compositions.
+- Added an original Blender-built Veya Core monogram with seven separate precision layers, local 35KB GLB and 52KB rendered WebP. Visitors can separate/reassemble layers, rotate and switch finishes. Keyboard/touch users have explicit controls.
+- Added an accessible capability explorer, expandable service details, chapter navigation, project-role disclosures and a scroll-progress rail. No invented client work or testimonials.
+- Restyled all estimator states, including package entry, saved draft, option cards, live quote and final review. **app/sections.tsx is byte-for-byte identical to the rollback checkpoint.** Price tables, option IDs, dependencies, package matching, persistence, brief download and contact handoff logic are unchanged.
+- Contact form and API source, dependencies and package lock are unchanged.
+- Dark and light palettes, responsive layouts, visible focus, reduced motion and print styles included. 3D pauses offscreen and when the tab is hidden; static fallback remains available.
+
+Validation: production build and TypeScript pass; 17 rendered-route, enquiry and asset checks pass. Estimator source hash matches the checkpoint. Blender poster visually inspected. No browser interaction testing was performed. Founder email configuration remains outside this design-only change.
+
+Technical references: https://www.blender.org/releases/4-5/ and https://threejs.org/docs/pages/GLTFLoader.html
