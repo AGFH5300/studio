@@ -7,6 +7,11 @@ import {places,type PlaceId} from './campus-data';
 import type {CampusControl} from './campus-scene';
 
 export function WorldShell({children}:{children:ReactNode}){
+ const path=usePathname();
+ if(process.env.NODE_ENV!=="production" && path==="/lab/fold")return <>{children}</>;
+ return <CampusShell>{children}</CampusShell>;
+}
+function CampusShell({children}:{children:ReactNode}){
  const path=usePathname(),router=useRouter();const host=useRef<HTMLDivElement>(null),instance=useRef<CampusControl|null>(null),labels=useRef<Record<string,HTMLButtonElement|null>>({});const menu=useRef<HTMLDetailsElement>(null);const [ready,setReady]=useState(false),[failed,setFailed]=useState(false),[night,setNight]=useState(false),[help,setHelp]=useState(false);const place=places.find(p=>p.path===path);const home=path==='/',wide=path==='/build'||path==='/contact'||path==='/privacy';
  const routeRef=useRef(router);routeRef.current=router;
  useEffect(()=>{let ended=false,control:CampusControl|null=null;const el=host.current;if(!el)return;

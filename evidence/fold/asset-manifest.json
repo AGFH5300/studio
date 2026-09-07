@@ -1,0 +1,75 @@
+{
+  "note": "CSS/SVG runtime is the verified authoring/export path. No Blender/GLB export occurred. WebGL source is retained but unverified. Counts are unavailable, not zero. Source checksums authoritative if later source revision changes.",
+  "assets": [
+    {
+      "id": "page",
+      "source_file": "app/lab/fold/page.tsx",
+      "web_file": "app/lab/fold/page.tsx",
+      "bytes": 992,
+      "gzip_bytes": 595,
+      "sha256": "3086849529d7c2ce73fbca53ea8cf238dfbf389d6ce2542b56e86657ebb37713",
+      "source_revision": "f128140",
+      "export_revision": "runtime-generated",
+      "license": "Original Veya prototype; Three.js dependency MIT",
+      "triangles": null,
+      "material_count": null,
+      "texture_dimensions": []
+    },
+    {
+      "id": "physical",
+      "source_file": "app/lab/fold/physical.tsx",
+      "web_file": "app/lab/fold/physical.tsx",
+      "bytes": 2977,
+      "gzip_bytes": 1493,
+      "sha256": "5e4dcc31c25f4f0bc40899d65e65b97d354214449323b1ac518ba8f7a606631e",
+      "source_revision": "f128140",
+      "export_revision": "runtime-generated",
+      "license": "Original Veya prototype; Three.js dependency MIT",
+      "triangles": null,
+      "material_count": null,
+      "texture_dimensions": []
+    },
+    {
+      "id": "prototype",
+      "source_file": "app/lab/fold/prototype.tsx",
+      "web_file": "app/lab/fold/prototype.tsx",
+      "bytes": 5072,
+      "gzip_bytes": 2247,
+      "sha256": "09fbe7feaa4ab5e0c05060c19fc4dccef3d3356fbecab993c8f467c1a3f69807",
+      "source_revision": "f128140",
+      "export_revision": "runtime-generated",
+      "license": "Original Veya prototype; Three.js dependency MIT",
+      "triangles": null,
+      "material_count": null,
+      "texture_dimensions": []
+    },
+    {
+      "id": "scene",
+      "source_file": "app/lab/fold/scene.ts",
+      "web_file": "app/lab/fold/scene.ts",
+      "bytes": 7678,
+      "gzip_bytes": 3298,
+      "sha256": "04b63e8ea976a2122af8420bf3f426d745190fefc7dd5423300ba76797f17700",
+      "source_revision": "f128140",
+      "export_revision": "runtime-generated",
+      "license": "Original Veya prototype; Three.js dependency MIT",
+      "triangles": null,
+      "material_count": null,
+      "texture_dimensions": []
+    },
+    {
+      "id": "style",
+      "source_file": "app/lab/fold/style.css",
+      "web_file": "app/lab/fold/style.css",
+      "bytes": 11881,
+      "gzip_bytes": 3569,
+      "sha256": "45a7936cf5d3b48800da79bb3a65c495644615e077786f2349f953305dedb120",
+      "source_revision": "f128140",
+      "export_revision": "runtime-generated",
+      "license": "Original Veya prototype; Three.js dependency MIT",
+      "triangles": null,
+      "material_count": null,
+      "texture_dimensions": []
+    }
+  ]
+}
