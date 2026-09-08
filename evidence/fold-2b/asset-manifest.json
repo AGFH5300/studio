@@ -1,0 +1,66 @@
+{
+  "revision": "Candidate A",
+  "entries": [
+    {
+      "path": "app/lab/fold/prototype.tsx",
+      "bytes": 5347,
+      "sha256": "f45c5a6fd3a846551e4d5426aa0ca81c43f17e2db2bee22780a166d673409546"
+    },
+    {
+      "path": "app/lab/fold/screen-art.ts",
+      "bytes": 5797,
+      "sha256": "fd1fd984dec61a8264fd124da23fca6724d47fe01f1342d6ae518b64b3ec79cd"
+    },
+    {
+      "path": "app/lab/fold/page.tsx",
+      "bytes": 1067,
+      "sha256": "cd1415f1904beca0abeb1bf9c047c0fa6633f382d0f9de135230cdd643a2972c"
+    },
+    {
+      "path": "app/lab/fold/scene.ts",
+      "bytes": 6856,
+      "sha256": "1a981cc949b3d8d05a53dd7a7de2bce52146bf3695cb72471c480dfbb10b5015"
+    },
+    {
+      "path": "app/lab/fold/model.ts",
+      "bytes": 5186,
+      "sha256": "c47918db6f6c3294ebff3bfe8482b633da6b4b6007b6c3cd22b2380b7ff6cbae"
+    },
+    {
+      "path": "app/lab/fold/physical.tsx",
+      "bytes": 2977,
+      "sha256": "5e4dcc31c25f4f0bc40899d65e65b97d354214449323b1ac518ba8f7a606631e"
+    },
+    {
+      "path": "evidence/fold-2b/target-rejected-portrait.png",
+      "bytes": 1841831,
+      "sha256": "0cece60ed0b206bc823b7c677a7a7bc396cc283054fd23c123b6c3a0f117f809"
+    },
+    {
+      "path": "evidence/fold-2b/target-selected-three-states.png",
+      "bytes": 1814952,
+      "sha256": "8f58a009a3c5931962a694f9dae4c7100cf58b86ee71641c25d3372a843fecd7"
+    }
+  ],
+  "runtime_art": "Original procedural canvas illustration; no image-generation output loaded at runtime",
+  "external_materials": "RoomEnvironment, Three.js MIT; no external HDRI",
+  "texture_sizes": {
+    "site": [
+      1536,
+      1080
+    ],
+    "content": [
+      1536,
+      1080
+    ],
+    "phone": [
+      512,
+      1080
+    ],
+    "roughness": [
+      128,
+      128
+    ]
+  },
+  "runtime_geometry_counters": "Pending GPU capture; CPU counts in geometry-check.json"
+}

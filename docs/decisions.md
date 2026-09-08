@@ -13,3 +13,8 @@
 9. Commercial audit discrepancy: existing Starter code says 5 pages; Session 1 approximate boundary says 4. Preserve both records, change neither package logic nor pricing during Phase 2.
 
 10. On resumption, replace environmental “FAIL” wording with CONDITIONAL PASS — WEBGL VISUAL GATE UNVERIFIED. One fresh supported-browser retry confirms the limitation. Stop renderer investigation; do not infer design failure from missing WebGL access.
+
+
+## 2026-09-08 — Phase 2B Checkpoint A
+
+Branch `feat/veya-fold-phase-2b` starts at `5cee6d8`. Upgraded GPU geometry, recessed frames, structural spine/chassis/feet, rearward mobile hinge, studio reflections/lights, perspective camera and editorial Saha screen art. CSS fallback, shared React content, mobile controls and production guard preserved. Two independent generated target passes retained; first rejected. Build/TypeScript/Fold lint and CPU subframe clearance checks pass. No GPU visual claim: STOP at Candidate A and obtain local Mac screenshots. See `docs/fold-2b-comparison.md` for target interpretation, evidence slots, commands and URLs. No deployment or estimator work.

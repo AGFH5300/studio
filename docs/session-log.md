@@ -13,3 +13,8 @@ Run: npm run install:ci (dependencies absent only); npm run dev; route /lab/fold
 ## Resumption checkpoint
 
 Recovered existing working tree without repeating research, tool audit, mechanism studies or CMS/mobile implementation. Build, TypeScript and Fold-only lint rerun successfully. Committed previously pending work as `f128140`. One fresh supported browser attempt again failed WebGL context creation; no alternate rendering capability exposed. Stopped investigation per scope. Inspected final CSS open framing and retained `fold-open-resumed.jpg`. Final classification corrected to CONDITIONAL PASS — WEBGL VISUAL GATE UNVERIFIED; this is an environmental limitation, not evidence the concept fails. Actual materials, lighting, mesh/runtime appearance, GPU performance and WebGL mobile performance remain UNTESTED. No Phase 3 or deployment work performed.
+
+
+## 2026-09-08 — Phase 2B Checkpoint A
+
+Branch `feat/veya-fold-phase-2b` starts at `5cee6d8`. Upgraded GPU geometry, recessed frames, structural spine/chassis/feet, rearward mobile hinge, studio reflections/lights, perspective camera and editorial Saha screen art. CSS fallback, shared React content, mobile controls and production guard preserved. Two independent generated target passes retained; first rejected. Build/TypeScript/Fold lint and CPU subframe clearance checks pass. No GPU visual claim: STOP at Candidate A and obtain local Mac screenshots. See `docs/fold-2b-comparison.md` for target interpretation, evidence slots, commands and URLs. No deployment or estimator work.

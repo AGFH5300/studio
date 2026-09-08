@@ -1,3 +1,15 @@
+# Phase 2B — Checkpoint A awaiting local GPU evidence
+
+Read `docs/fold-2b-comparison.md` first. Repository AGFH5300/studio; branch `feat/veya-fold-phase-2b`, based on Phase 2 `5cee6d8`. Current GPU candidate source in `app/lab/fold/`: model.ts, screen-art.ts, scene.ts. Shared React headline and CSS fallback remain preserved. No production deploy or Phase 3.
+
+Independent targets and CPU check: `evidence/fold-2b/`. Two image-generation passes; selected three-state board is art direction, never runtime evidence. CPU Fold assembly: 59 meshes / 23,830 triangles; 101 subframe clearance samples pass. Production build, TypeScript and focused lint pass. Actual GPU result remains uninspected.
+
+**STOP now and obtain user-local GPU screenshots.** Do not retry the disabled Work browser, repeat research/mechanism studies, or continue blind polish. Use the exact Mac commands and seven core URLs in the comparison record. Badge must say WEBGL2 ACTIVE. When screenshots return, rank only three visual deficiencies, correct one coherent pass, then compare the same states. Final visual verdict only after actual GPU evidence.
+
+Geometry change: the right mobile wing now opens rearward from its rear cavity to avoid crossing the content chassis. Spine backplate joins clevis seats and lower rail/feet. Materials use PMREM reflections and area lights plus directional shadows; no physics, bloom or new renderer dependency. Figure/image targets do not override fixed support or actual landscape panel dimensions. Renderer status and GPU diagnostics must remain distinguishable from fallback.
+
+---
+
 # Phase 2 continuation — read this first
 
 **Full Fold visual feasibility: CONDITIONAL PASS — WEBGL VISUAL GATE UNVERIFIED. Do not start the full estimator.**

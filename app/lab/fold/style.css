@@ -11,3 +11,5 @@
 
 .saha footer{color:#566354}.fold-header>a:last-child{margin-right:10px}
 @media(max-width:600px){.fold-demo{grid-template-columns:1.15fr .85fr;gap:14px}.fold-demo>div{grid-column:1/-1;margin-bottom:8px}.fold-html-site,.fold-html-phone{width:100%;min-height:220px;padding:17px 13px;align-self:stretch}.fold-html-phone{border-width:5px}.fold-demo article h3{font-size:21px;overflow-wrap:anywhere}.fold-demo article>span:first-child{font-size:7px;letter-spacing:.6px}.fold-demo article p{font-size:9px}.sample-link{font-size:8px}}
+
+.fold-gpu-status{position:absolute;top:16px;right:20px;font:9px Arial;letter-spacing:1px;color:#bac5ce;background:#171b20cc;padding:8px;border:1px solid #ffffff20;z-index:3}

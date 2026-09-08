@@ -110,3 +110,8 @@ The resumed open screenshot confirms the final framing correction keeps all thre
 ### Side-bound identity review
 
 The folio is intentionally book-like in its opening verb; that helps comprehension, but the large rectangular face still carries most of its identity. It does not read as a laptop: there is no keyboard, horizontal base or laptop hinge. The cobalt spine owns the hinge barrels and extends to the foot, so it explains structure rather than merely outlining a screen. The open state remains one joined object, and the half-open state is comprehensible in the fallback. The source panel explains website-to-system; the actual CMS edit supplies stronger proof than the static metaphor alone. Brand recognition is **provisional**, not proven distinctive enough for full-site repetition. Do not add decoration to conceal that uncertainty. Next physical pass should retain the spine/foot relationship and test solid edge geometry and silhouette under neutral light before any expansion.
+
+
+## 2026-09-08 — Phase 2B Checkpoint A
+
+Branch `feat/veya-fold-phase-2b` starts at `5cee6d8`. Upgraded GPU geometry, recessed frames, structural spine/chassis/feet, rearward mobile hinge, studio reflections/lights, perspective camera and editorial Saha screen art. CSS fallback, shared React content, mobile controls and production guard preserved. Two independent generated target passes retained; first rejected. Build/TypeScript/Fold lint and CPU subframe clearance checks pass. No GPU visual claim: STOP at Candidate A and obtain local Mac screenshots. See `docs/fold-2b-comparison.md` for target interpretation, evidence slots, commands and URLs. No deployment or estimator work.

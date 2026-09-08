@@ -1,37 +1,58 @@
 import * as T from 'three';
-import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import {createFold} from './model';
+import {createScreens} from './screen-art';
 export type FoldControl={pose:(n:number,instant?:boolean)=>void;headline:(s:string)=>void;dispose:()=>void};
-export function mountFold(host:HTMLElement,opts:{clay:boolean;study:number;mobile:boolean;ready:()=>void;stats:(s:string)=>void}):FoldControl{
- const scene=new T.Scene();scene.background=new T.Color('#171b20');
- const renderer=new T.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;host.appendChild(renderer.domElement);
- const camera=new T.OrthographicCamera(-6,6,4,-4,.1,100);camera.position.set(opts.mobile?0:7,opts.mobile?3:5,14);camera.lookAt(0,1.6,0);
- const porcelain=new T.MeshStandardMaterial({color:opts.clay?'#aaa9a5':'#e9e6de',roughness:.32,metalness:.08});const metal=new T.MeshStandardMaterial({color:'#8c9298',metalness:.8,roughness:.27});const cobalt=new T.MeshStandardMaterial({color:'#365cf5',metalness:.3,roughness:.3});const graphite=new T.MeshStandardMaterial({color:'#242b32',roughness:.55});
- function box(parent:T.Object3D,w:number,h:number,d:number,x:number,y:number,z:number,m:T.Material=porcelain,r=.055){const mesh=new T.Mesh(new RoundedBoxGeometry(w,h,d,3,r),m);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh}
- function pin(parent:T.Object3D,x:number,y:number,z:number,h:number){const m=new T.Mesh(new T.CylinderGeometry(.075,.075,h,20),metal);m.position.set(x,y,z);m.castShadow=true;parent.add(m)}
- const root=new T.Group();scene.add(root);root.position.set(-.2,1.85,0);
- // One anchored chassis, with an asymmetric spine extending below the folio.
- box(root,3.55,2.7,.22,.25,0,-.12);box(root,.28,3.32,.38,-1.65,-.18,.02,cobalt);box(root,.78,.15,1.35,-1.55,-1.82,-.05,metal);box(root,2.65,.13,.8,.15,-1.66,-.13,graphite);
- const leaf=new T.Group();leaf.position.set(-1.65,0,.20);root.add(leaf);box(leaf,3.5,2.7,.13,1.8,0,0);box(leaf,.1,2.4,.16,3.51,0,0,cobalt,.03);
- for(const y of [-1.05,1.05]){pin(root,-1.65,y,.20,.36);box(leaf,.32,.17,.13,.13,y,0,metal,.025)}
- const wing=new T.Group();wing.position.set(1.95,0,-.06);root.add(wing);box(wing,1.12,2.3,.12,-.61,0,-.1);for(const y of [-.85,.85]){pin(root,1.95,y,-.06,.25);box(wing,.2,.12,.15,-.09,y,-.05,metal,.025)}
- const canvases:HTMLCanvasElement[]=[];const textures:T.CanvasTexture[]=[];
- function surface(parent:T.Object3D,w:number,h:number,x:number,y:number,z:number,back=false,kind='site'){
- const c=document.createElement('canvas');c.width=kind==='phone'?512:1536;c.height=kind==='phone'?1024:1080;canvases.push(c);const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=renderer.capabilities.getMaxAnisotropy();textures.push(tex);const mesh=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tex,color:opts.clay?'#aaa9a5':'white'}));mesh.position.set(x,y,z);if(back)mesh.rotation.y=Math.PI;parent.add(mesh);return {c,tex,kind}}
- const displays=[surface(leaf,3.27,2.45,1.8,0,.071),surface(leaf,3.27,2.45,1.8,0,-.071,true),surface(root,3.2,2.35,.25,0,.001,false,'cms'),surface(wing,.95,2.06,-.61,0,-.165,true,'phone')];
- function draw(s:string){for(const {c,tex,kind} of displays){const g=c.getContext('2d')!;const w=c.width,h=c.height;g.fillStyle='#efeee7';g.fillRect(0,0,w,h);g.fillStyle='#233b33';g.font=`${kind==='phone'?27:30}px Arial`;g.fillText(kind==='cms'?'01 / CONTENT SOURCE':'SAHA   /   RETREAT',w*.07,h*.10);
- if(kind==='cms'){g.font='64px Georgia';g.fillText('One story.',100,285);g.fillText('Every screen.',100,365);g.fillStyle='#d5dbd3';g.fillRect(100,430,1336,300);g.fillStyle='#233b33';g.font='28px Arial';g.fillText('HERO HEADLINE',140,490);wrap(g,s,140,565,1200,60,48);g.font='28px Arial';g.fillText('Website  /  Mobile',100,865);g.fillText('LOCAL CONTENT DEMONSTRATION',100,970);
- }else{g.font=`${kind==='phone'?48:86}px Georgia`;wrap(g,s,w*.07,h*.24,w*.85,kind==='phone'?54:98,kind==='phone'?48:86);g.font=`${kind==='phone'?21:27}px Arial`;g.fillText('A slower kind of stay. Ras Al Khaimah.',w*.07,h*.44);g.fillStyle='#233b33';g.fillRect(w*.07,h*.49,w*.32,h*.065);g.fillStyle='#fff';g.fillText('Discover Saha ↗',w*.09,h*.534);
- // Original procedural editorial illustration: terraced desert architecture.
- g.fillStyle='#c6b69a';g.fillRect(w*.07,h*.60,w*.86,h*.31);g.fillStyle='#a19277';g.beginPath();g.moveTo(w*.07,h*.85);g.bezierCurveTo(w*.3,h*.6,w*.7,h*.95,w*.93,h*.68);g.lineTo(w*.93,h*.91);g.lineTo(w*.07,h*.91);g.fill();g.fillStyle='#e9dfca';g.fillRect(w*.34,h*.65,w*.40,h*.18);g.fillStyle='#d5c7af';g.fillRect(w*.39,h*.61,w*.30,h*.05);g.fillStyle='#464d3b';for(let i=0;i<5;i++)g.fillRect(w*(.37+i*.067),h*.69,w*.038,h*.14);g.fillStyle='#737b60';g.fillRect(w*.16,h*.80,w*.1,h*.03);g.font=`${kind==='phone'?16:23}px Arial`;g.fillStyle='#233b33';g.fillText('Fictional hospitality concept • UAE',w*.07,h*.965)}tex.needsUpdate=true}}
- function wrap(g:CanvasRenderingContext2D,s:string,x:number,y:number,width:number,line:number,size:number){g.font=`${size}px Georgia`;let row='';for(const word of s.split(' ')){if(g.measureText(row+word).width>width&&row){g.fillText(row,x,y);y+=line;row=''}row+=word+' '}g.fillText(row,x,y)}
- draw('Room to return to yourself.');
- const floor=box(scene,200,.15,200,0,-.18,0,new T.MeshStandardMaterial({color:'#252b31',roughness:.78}),.02);floor.receiveShadow=true;
- box(scene,18,.10,6,0,-.05,-1.3,new T.MeshStandardMaterial({color:'#30373d',roughness:.65}),.035);
- const key=new T.DirectionalLight('#fff1d9',4.5);key.position.set(-3,9,6);key.castShadow=true;key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-9,right:9,top:8,bottom:-8});key.shadow.normalBias=.025;scene.add(key);scene.add(new T.HemisphereLight('#bfcfff','#20232a',1.9));const fill=new T.DirectionalLight('#b0c5ff',2);fill.position.set(5,4,-4);scene.add(fill);
- let value=0,target=0,raf=0,last=performance.now(),count=0,sum=0,max=0;const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
- function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);const extent=opts.mobile?3.0:4.05;camera.left=-extent*w/h;camera.right=extent*w/h;camera.top=extent;camera.bottom=-extent;camera.updateProjectionMatrix()}
+export function mountFold(host:HTMLElement,opts:{clay:boolean;study:number;mobile:boolean;detail?:boolean;ready:()=>void;lost?:()=>void;stats:(s:string)=>void}):FoldControl{
+ const renderer=new T.WebGLRenderer({antialias:true,alpha:false});
+ renderer.setPixelRatio(Math.min(devicePixelRatio,opts.mobile?1.5:2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+ renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+ renderer.domElement.setAttribute('aria-hidden','true');renderer.domElement.dataset.renderer='webgl2';host.appendChild(renderer.domElement);
+ const scene=new T.Scene();scene.background=new T.Color('#171b20');scene.fog=new T.Fog('#171b20',25,55);
+ const pmrem=new T.PMREMGenerator(renderer);const room=new RoomEnvironment();const env=pmrem.fromScene(room,.035, .1,100);scene.environment=env.texture;scene.environmentIntensity=.38;room.dispose();pmrem.dispose();
+ const grain=new Uint8Array(128*128*4);let seed=173;for(let i=0;i<grain.length;i+=4){seed=(1664525*seed+1013904223)>>>0;const v=224+(seed%26);grain[i]=grain[i+1]=grain[i+2]=v;grain[i+3]=255}
+ const roughness=new T.DataTexture(grain,128,128);roughness.wrapS=roughness.wrapT=T.RepeatWrapping;roughness.repeat.set(6,6);roughness.needsUpdate=true;
+ const mineral=new T.MeshPhysicalMaterial({color:opts.clay?'#b4b2aa':'#e9e6de',metalness:0,roughness:.43,roughnessMap:roughness,clearcoat:.08,clearcoatRoughness:.4});
+ const metal=new T.MeshStandardMaterial({color:opts.clay?'#b4b2aa':'#adb8ba',metalness:opts.clay?0:.88,roughness:opts.clay?.65:.29});
+ const cobalt=new T.MeshStandardMaterial({color:opts.clay?'#b4b2aa':'#2848ba',metalness:.38,roughness:.33});
+ const dark=new T.MeshStandardMaterial({color:'#20282b',metalness:.08,roughness:.72});
+ const screens=createScreens(Math.min(8,renderer.capabilities.getMaxAnisotropy()));
+ const fold=createFold({mineral,metal,cobalt,dark},opts.clay?{site:mineral,content:mineral,phone:mineral}:screens);scene.add(fold.root);
+ const floorMat=new T.MeshStandardMaterial({color:'#252c31',roughness:.76});
+ const floor=new T.Mesh(new T.PlaneGeometry(100,100),floorMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.20;floor.receiveShadow=true;scene.add(floor);
+ const stageMat=new T.MeshStandardMaterial({color:'#323b40',roughness:.61,metalness:.08});
+ const stage=new T.Mesh(new T.BoxGeometry(17,.20,7.5),stageMat);stage.position.set(.5,-.1,-1);stage.receiveShadow=true;stage.castShadow=true;scene.add(stage);
+ const backingMat=new T.MeshStandardMaterial({color:'#232b31',roughness:.82});
+ const backing=new T.Mesh(new T.BoxGeometry(13,4,.30),backingMat);backing.position.set(-1,1.8,-5.4);backing.rotation.y=.11;backing.receiveShadow=true;scene.add(backing);
+ RectAreaLightUniformsLib.init();
+ const area=new T.RectAreaLight('#fff0db',5.0,6,5);area.position.set(-3.5,7,5);area.lookAt(1,1.5,0);scene.add(area);
+ // RectAreaLight supplies broad reflections; co-located directional supplies real shadow maps.
+ const key=new T.DirectionalLight('#ffecd2',2.2);key.position.set(-4,8,6);key.target.position.set(1,1,0);key.castShadow=true;key.shadow.mapSize.set(opts.mobile?1024:2048,opts.mobile?1024:2048);Object.assign(key.shadow.camera,{left:-8,right:8,top:7,bottom:-5,near:.1,far:30});key.shadow.normalBias=.014;key.shadow.bias=-.00008;scene.add(key,key.target);
+ const fill=new T.RectAreaLight('#b7cded',1.4,3,5);fill.position.set(6,4,2);fill.lookAt(1,1.5,0);scene.add(fill);
+ const rim=new T.RectAreaLight('#e4eaff',3.5,2,4);rim.position.set(-3,4,-3);rim.lookAt(0,1.5,0);scene.add(rim);
+ scene.add(new T.HemisphereLight('#c4ccd0','#28241e',.30));
+ const camera=new T.PerspectiveCamera(30,1,.1,80);let mobile=opts.mobile;
+ let value=0,target=0,from=0,start=0,animating=false,raf=0,last=0,reportedReady=false;let intervals:number[]=[];let disposed=false;
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+ function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;mobile=w<600;renderer.setPixelRatio(Math.min(devicePixelRatio,mobile?1.5:2));renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix()}
  const observer=new ResizeObserver(resize);observer.observe(host);resize();
- function pose(n:number,instant=false){target=n;if(instant||reduce)value=n}
- function render(now:number){const dt=Math.min((now-last)/1000,.1);last=now;value+=Math.sign(target-value)*Math.min(Math.abs(target-value),dt/1.2);const t=value*value*(3-2*value);leaf.rotation.y=-(opts.study===2?2.15:2.72)*t;wing.rotation.y=(opts.mobile?0:2.70)*t;wing.visible=!opts.mobile;root.rotation.z=opts.study===1?-.12:0;root.position.x=opts.mobile?-.2:1.1*t-.2;root.scale.setScalar(opts.mobile?.8:1);renderer.render(scene,camera);count++;sum+=dt;max=Math.max(max,dt);if(count%120===0){opts.stats(`${renderer.info.render.triangles.toLocaleString()} triangles · ${renderer.info.render.calls} draws · ${(count/sum).toFixed(0)} fps average · ${(max*1000).toFixed(0)} ms max interval`)}raf=requestAnimationFrame(render)}raf=requestAnimationFrame(render);opts.ready();
- return {pose,headline:draw,dispose(){cancelAnimationFrame(raf);observer.disconnect();scene.traverse(o=>{if(o instanceof T.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});textures.forEach(t=>t.dispose());renderer.dispose();renderer.domElement.remove()}};
+ function pose(n:number,instant=false){target=T.MathUtils.clamp(n,0,1);from=value;start=performance.now();animating=!(instant||reduce.matches);if(!animating)value=target;intervals=[];last=0}
+ function cameraPose(){
+  if(opts.detail){camera.position.set(1.35,2.8,5.4);camera.lookAt(.05,1.65,.1);camera.fov=29;}
+  else if(mobile){camera.fov=32;camera.position.set(2.05,3.0,11.4);camera.lookAt(1.8,1.7,0);}
+  else{camera.fov=30;const cx=T.MathUtils.lerp(1.7,.40,value);const distance=T.MathUtils.lerp(10.8,15.8,value);camera.position.set(cx+distance*.17,2.0+distance*.17,distance);camera.lookAt(cx,1.75,.10)}
+  camera.updateProjectionMatrix();
+ }
+ function render(now:number){if(disposed)return;
+  if(animating){const t=Math.min(1,(now-start)/1200);const eased=t*t*(3-2*t);value=T.MathUtils.lerp(from,target,eased);if(t===1)animating=false}
+  if(last){intervals.push(now-last);if(intervals.length>120)intervals.shift()}last=now;
+  fold.pose(value,mobile);cameraPose();renderer.render(scene,camera);
+  if(!reportedReady){reportedReady=true;opts.ready()}
+  if(intervals.length===120){const mean=intervals.reduce((a,b)=>a+b,0)/120;opts.stats(`WebGL2 active · ${renderer.info.render.triangles.toLocaleString()} triangles · ${renderer.info.render.calls} draws · ${(1000/mean).toFixed(1)} fps callback mean · ${(screens.textureBytes/1048576).toFixed(1)} MiB display textures incl. mipmaps`);intervals=[]}
+  raf=requestAnimationFrame(render);
+ }
+ function lost(event:Event){event.preventDefault();cancelAnimationFrame(raf);renderer.domElement.style.visibility='hidden';opts.stats('WebGL context lost · CSS fallback active');opts.lost?.()}
+ renderer.domElement.addEventListener('webglcontextlost',lost);raf=requestAnimationFrame(render);
+ return {pose,headline:screens.update,dispose(){disposed=true;cancelAnimationFrame(raf);observer.disconnect();renderer.domElement.removeEventListener('webglcontextlost',lost);const geometries=new Set<T.BufferGeometry>();scene.traverse(o=>{if(o instanceof T.Mesh)geometries.add(o.geometry)});geometries.forEach(g=>g.dispose());[mineral,metal,cobalt,dark,floorMat,stageMat,backingMat].forEach(m=>m.dispose());roughness.dispose();screens.dispose();env.dispose();renderer.dispose();renderer.domElement.remove()}};
 }
